@@ -53,15 +53,8 @@ return {
         'tpope/vim-fugitive',
     },
     {
-        "nvim-neo-tree/neo-tree.nvim",
-        branch = "v3.x",
-        lazy = false,
-        dependencies = {
-            "nvim-lua/plenary.nvim",
-            "nvim-tree/nvim-web-devicons", -- not strictly required, but recommended
-            "MunifTanjim/nui.nvim",
-            -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
-        }
+        'nvim-tree/nvim-tree.lua',
+        enable = false
     },
     {
         "olrtg/nvim-emmet",
@@ -69,5 +62,13 @@ return {
             vim.keymap.set({ "n", "v" }, '<leader>xe', require('nvim-emmet').wrap_with_abbreviation)
         end,
     },
+    {
+        'captbaritone/better-indent-support-for-php-with-html'
+    },
+    {
+        "nosduco/remote-sshfs.nvim",
+        dependencies = { "nvim-telescope/telescope.nvim" },
+        opts = {},
+    }
 }
 
