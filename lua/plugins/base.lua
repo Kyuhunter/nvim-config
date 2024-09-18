@@ -13,6 +13,10 @@ return {
         dependencies = 'nvim-lua/plenary.nvim'
     },
     {
+        "nvim-telescope/telescope-file-browser.nvim",
+        dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+    },
+    {
         'nvim-treesitter/nvim-treesitter',
         build = ":TSUpdate"
     },
@@ -32,7 +36,14 @@ return {
         'neovim/nvim-lspconfig'
     },
     {
-        'hrsh7th/nvim-cmp'
+        'hrsh7th/nvim-cmp',
+        opts = function(_, opts)
+            opts.sources = opts.sources or {}
+            table.insert(opts.sources, {
+                name = "lazydev",
+                group_index = 0, -- set group index to 0 to skip loading LuaLS completions
+            })
+        end,
     },
     {
         'hrsh7th/cmp-nvim-lsp',
@@ -53,10 +64,6 @@ return {
         'tpope/vim-fugitive',
     },
     {
-        'nvim-tree/nvim-tree.lua',
-        enable = false
-    },
-    {
         "olrtg/nvim-emmet",
         config = function()
             vim.keymap.set({ "n", "v" }, '<leader>xe', require('nvim-emmet').wrap_with_abbreviation)
@@ -69,6 +76,45 @@ return {
         "nosduco/remote-sshfs.nvim",
         dependencies = { "nvim-telescope/telescope.nvim" },
         opts = {},
-    }
+    },
+    {
+        'andymass/vim-matchup'
+    },
+    {
+        'numToStr/Comment.nvim',
+    },
+    {
+        'nvim-lualine/lualine.nvim',
+        dependencies = { 'nvim-tree/nvim-web-devicons' },
+    },
+    {
+        'mfussenegger/nvim-dap',
+    },
+    {
+        "rcarriga/nvim-dap-ui",
+        dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"}
+    },
+    {
+        "folke/lazydev.nvim",
+        ft = "lua", -- only load on lua files
+        opts = {
+            library = {
+                -- See the configuration section for more details
+                -- Load luvit types when the `vim.uv` word is found
+                { path = "luvit-meta/library", words = { "vim%.uv" } },
+                { plugins = { "nvim-dap-ui" }, types = true },
+            },
+        },
+    },
+    {
+        "Bilal2453/luvit-meta",
+        lazy = true,
+    }, -- optional `vim.uv` typings
+    {
+        'theHamsta/nvim-dap-virtual-text',
+    },
+    {
+        "jonboh/nvim-dap-rr",
+        dependencies = {"nvim-dap", "telescope.nvim"},
+    },
 }
-
