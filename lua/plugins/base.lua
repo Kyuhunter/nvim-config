@@ -51,6 +51,9 @@ return {
         priority = 999
     },
     {
+        "hrsh7th/cmp-path",
+    },
+    {
         'williamboman/mason.nvim'
     },
     {
