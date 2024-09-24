@@ -117,4 +117,10 @@ return {
         "jonboh/nvim-dap-rr",
         dependencies = {"nvim-dap", "telescope.nvim"},
     },
+    {
+        "wintermute-cell/gitignore.nvim",
+        config = function()
+            require('gitignore')
+        end,
+    }
 }
