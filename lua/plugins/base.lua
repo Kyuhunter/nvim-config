@@ -122,5 +122,10 @@ return {
         config = function()
             require('gitignore')
         end,
-    }
+    },
+    {
+        "folke/todo-comments.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        opts = {}
+    },
 }
