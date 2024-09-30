@@ -131,4 +131,7 @@ return {
         dependencies = { "nvim-lua/plenary.nvim" },
         opts = {}
     },
+    {
+        "dstein64/vim-startuptime"
+    },
 }
