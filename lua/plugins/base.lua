@@ -76,11 +76,6 @@ return {
         'captbaritone/better-indent-support-for-php-with-html'
     },
     {
-        "nosduco/remote-sshfs.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim" },
-        opts = {},
-    },
-    {
         'andymass/vim-matchup'
     },
     {
@@ -91,35 +86,9 @@ return {
         dependencies = { 'nvim-tree/nvim-web-devicons' },
     },
     {
-        'mfussenegger/nvim-dap',
-    },
-    {
-        "rcarriga/nvim-dap-ui",
-        dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"}
-    },
-    {
-        "folke/lazydev.nvim",
-        ft = "lua", -- only load on lua files
-        opts = {
-            library = {
-                -- See the configuration section for more details
-                -- Load luvit types when the `vim.uv` word is found
-                { path = "luvit-meta/library", words = { "vim%.uv" } },
-                { plugins = { "nvim-dap-ui" }, types = true },
-            },
-        },
-    },
-    {
         "Bilal2453/luvit-meta",
         lazy = true,
     }, -- optional `vim.uv` typings
-    {
-        'theHamsta/nvim-dap-virtual-text',
-    },
-    {
-        "jonboh/nvim-dap-rr",
-        dependencies = {"nvim-dap", "telescope.nvim"},
-    },
     {
         "wintermute-cell/gitignore.nvim",
         config = function()
@@ -130,8 +99,5 @@ return {
         "folke/todo-comments.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         opts = {}
-    },
-    {
-        "dstein64/vim-startuptime"
     },
 }
