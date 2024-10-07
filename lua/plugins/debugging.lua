@@ -20,7 +20,7 @@ return {
     {
         "Bilal2453/luvit-meta",
         lazy = true,
-    }, -- optional `vim.uv` typings
+    },
     {
         'theHamsta/nvim-dap-virtual-text',
         lazy = true,
@@ -128,5 +128,10 @@ return {
             },
         },
         lazy = true,
+    },
+    {
+        'leoluz/nvim-dap-go',
+        lazy = true,
+        opts = {},
     },
 }
