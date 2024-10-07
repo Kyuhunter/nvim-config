@@ -26,13 +26,11 @@ vim.g.maplocalleader = " "
 
 require('config.keymaps') -- custom keymaps
 require('config.options') -- custom options
+require('config.autocmds') -- custom autocmds
 require('config.fextensions') -- file type extension mapping
 
 -- Setup lazy.nvim
 require("lazy").setup({
-    defaults = {
-        lazy = true
-    },
     spec = {
         -- import your plugins
         { import = "plugins" },
@@ -44,13 +42,3 @@ require("lazy").setup({
     -- checker = { enabled = true },
 })
 
--- Run gofmt + goimports on save
---
-local format_sync_grp = vim.api.nvim_create_augroup("goimports", {})
-vim.api.nvim_create_autocmd("BufWritePre", {
-    pattern = "*.go",
-    callback = function()
-        require('go.format').goimports()
-    end,
-    group = format_sync_grp,
-})

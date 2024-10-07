@@ -9,16 +9,38 @@ return {
         end,
     },
     {
-        'nvim-telescope/telescope.nvim', tag = '0.1.8',
-        dependencies = 'nvim-lua/plenary.nvim'
-    },
-    {
-        "nvim-telescope/telescope-file-browser.nvim",
-        dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
-    },
-    {
         'nvim-treesitter/nvim-treesitter',
-        build = ":TSUpdate"
+        build = ":TSUpdate",
+        opts = {
+
+            -- A list of parser names, or "all" (the listed parsers MUST always be installed)
+            ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline", "javascript", "typescript", "rust", "python", "php", 'html' },
+
+            -- Install parsers synchronously (only applied to `ensure_installed`)
+            sync_install = false,
+
+            -- Automatically install missing parsers when entering buffer
+            -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
+            auto_install = true,
+
+            ---- If you need to change the installation directory of the parsers (see -> Advanced Setup)
+            -- parser_install_dir = "/some/path/to/store/parsers", -- Remember to run vim.opt.runtimepath:append("/some/path/to/store/parsers")!
+
+            highlight = {
+                enable = true,
+                -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+                -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+                -- Using this option may slow down your editor, and you may see some duplicate highlights.
+                -- Instead of true it can also be a list of languages
+                additional_vim_regex_highlighting = true,
+            },
+
+            vim.treesitter.language.register('php', 'html5'),
+
+            matchup = {
+                enable = true,              -- mandatory, false will disable the whole extension
+            },
+        },
     },
     {
         'ThePrimeagen/harpoon',
@@ -30,37 +52,6 @@ return {
         init = function ()
             vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle)
         end
-    },
-    {
-        'VonHeikemen/lsp-zero.nvim',
-        branch = 'v4.x'
-    },
-    {
-        'neovim/nvim-lspconfig'
-    },
-    {
-        'hrsh7th/nvim-cmp',
-        opts = function(_, opts)
-            opts.sources = opts.sources or {}
-            table.insert(opts.sources, {
-                name = "lazydev",
-                group_index = 0, -- set group index to 0 to skip loading LuaLS completions
-            })
-        end,
-    },
-    {
-        'hrsh7th/cmp-nvim-lsp',
-        lazy = false,
-        priority = 999
-    },
-    {
-        "hrsh7th/cmp-path",
-    },
-    {
-        'williamboman/mason.nvim'
-    },
-    {
-        'williamboman/mason-lspconfig.nvim'
     },
     {
         'lewis6991/gitsigns.nvim',
@@ -181,5 +172,5 @@ return {
         "folke/todo-comments.nvim",
         dependencies = { "nvim-lua/plenary.nvim" },
         opts = {}
-    },
+    }
 }
