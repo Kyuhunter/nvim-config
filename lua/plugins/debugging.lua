@@ -1,7 +1,8 @@
 return {
     {
         "rcarriga/nvim-dap-ui",
-        dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"}
+        dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"},
+        lazy = true,
     },
     {
         "folke/lazydev.nvim",
@@ -14,6 +15,7 @@ return {
                 { plugins = { "nvim-dap-ui" }, types = true },
             },
         },
+        lazy = true,
     },
     {
         "Bilal2453/luvit-meta",
@@ -21,17 +23,21 @@ return {
     }, -- optional `vim.uv` typings
     {
         'theHamsta/nvim-dap-virtual-text',
+        lazy = true,
     },
     {
         "jonboh/nvim-dap-rr",
         dependencies = {"nvim-dap", "telescope.nvim"},
+        lazy = true,
     },
     {
         'mfussenegger/nvim-dap',
+        lazy = true,
     },
     {
         "rcarriga/nvim-dap-ui",
-        dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"}
+        dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"},
+        lazy = true,
     },
     {
         "folke/lazydev.nvim",
@@ -44,5 +50,6 @@ return {
                 { plugins = { "nvim-dap-ui" }, types = true },
             },
         },
+        lazy = true,
     },
 }

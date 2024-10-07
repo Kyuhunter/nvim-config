@@ -24,21 +24,24 @@ vim.g.maplocalleader = " "
 --vim.g.loaded_netrw = 1
 --vim.g.loaded_netrwPlugin = 1
 
-require('config.set')
-require('config.remap')
+require('config.keymaps') -- custom keymaps
+require('config.options') -- custom options
 require('config.fextensions') -- file type extension mapping
 
 -- Setup lazy.nvim
 require("lazy").setup({
-  spec = {
-    -- import your plugins
-    { import = "plugins" },
-  },
-  -- Configure any other settings here. See the documentation for more details.
-  -- colorscheme that will be used when installing plugins.
-  install = { colorscheme = { "habamax" } },
-  -- automatically check for plugin updates
-  -- checker = { enabled = true },
+    defaults = {
+        lazy = true
+    },
+    spec = {
+        -- import your plugins
+        { import = "plugins" },
+    },
+    -- Configure any other settings here. See the documentation for more details.
+    -- colorscheme that will be used when installing plugins.
+    install = { colorscheme = { "habamax" } },
+    -- automatically check for plugin updates
+    -- checker = { enabled = true },
 })
 
 -- Run gofmt + goimports on save
