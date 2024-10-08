@@ -1,60 +1,23 @@
 return {
     {
-        "rcarriga/nvim-dap-ui",
-        dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"},
-        lazy = true,
-    },
-    {
-        "folke/lazydev.nvim",
-        ft = "lua", -- only load on lua files
-        opts = {
-            library = {
-                -- See the configuration section for more details
-                -- Load luvit types when the `vim.uv` word is found
-                { path = "luvit-meta/library", words = { "vim%.uv" } },
-                { plugins = { "nvim-dap-ui" }, types = true },
-            },
-        },
-        lazy = true,
-    },
-    {
-        "Bilal2453/luvit-meta",
-        lazy = true,
-    },
-    {
-        'theHamsta/nvim-dap-virtual-text',
-        lazy = true,
-        opts = {
-            enabled = true,
-            virt_text_pos = 'eol',
-        },
-    },
-    {
-        "jonboh/nvim-dap-rr",
-        dependencies = {"nvim-dap", "telescope.nvim"},
-        lazy = true,
-        opts = {
-            mappings = {
-                continue = '<F5>',
-                step_over = '<F10>',
-                step_into = '<F11>',
-                step_out = '<F12>',
-                reverse_continue = '<F17>',
-                reverse_step_over = '<F22>',
-                reverse_step_into = '<F23>',
-                reverse_step_out = '<F24>',
-                step_over_i = '<F34>',
-                step_into_i = '<F35>',
-                step_out_i = '<F36>',
-                reverse_step_over_i = '<F46>',
-                reverse_step_into_i = '<F47>',
-                reverse_step_out_i = '<F48>',
-            }
-        },
-    },
-    {
         'mfussenegger/nvim-dap',
         lazy = true,
+        dependencies = {
+            {
+                "rcarriga/nvim-dap-ui",
+                dependencies = {
+                    "nvim-neotest/nvim-nio",
+                },
+                opts = {},
+            },
+            {
+                'theHamsta/nvim-dap-virtual-text',
+                opts = {
+                    enabled = true,
+                    virt_text_pos = 'eol',
+                },
+            },
+        },
         keys = {
             { '<F5>', ':lua require"dap".continue()<CR>' },
             { '<F10>', ':lua require"dap".step_over()<CR>' },
@@ -69,32 +32,6 @@ return {
         config = function()
             local dapui =  require("dapui")
             local dap = require("dap")
-
-            local cpptools_path = vim.fn.stdpath('data')..'/mason/packages/cpptools/extension/debugAdapters/bin/OpenDebugAD7'
-            dap.adapters.cppdbg = {
-                id = 'cppdbg',
-                type = 'executable',
-                command = cpptools_path,
-            }
-
-            local rr_dap = require('nvim-dap-rr')
-
-            -- LLDB debugger for C, C Derivatives and Rust
-            dap.adapters["lldb"] = function(adapter_callback, config, parent)
-                adapter_callback {
-                    id = 'lldb',
-                    type = 'executable',
-                    command = '/opt/homebrew/opt/llvm/bin/lldb-dap', -- must be absolute path
-                }
-            end
-
-            -- Rust config
-            dap.configurations.rust = { rr_dap.get_rust_config({
-                type = 'lldb',
-                name = 'Lauch',
-                request = 'launch',
-                cwd = '${workspaceFolder}',
-            })}
 
             dap.listeners.before.attach.dapui_config = function()
                 dapui.open()
@@ -111,14 +48,13 @@ return {
         end,
     },
     {
-        "rcarriga/nvim-dap-ui",
-        dependencies = {"mfussenegger/nvim-dap", "nvim-neotest/nvim-nio"},
-        lazy = true,
-        opts = {},
-    },
-    {
+        -- lazydev.nvim is a plugin that properly configures LuaLS for editing 
+        -- your Neovim config by lazily updating your workspace libraries. 
         "folke/lazydev.nvim",
         ft = "lua", -- only load on lua files
+        dependencies = {
+            "Bilal2453/luvit-meta", -- optional 'vim.uv' typings
+        },
         opts = {
             library = {
                 -- See the configuration section for more details
@@ -130,9 +66,16 @@ return {
         lazy = true,
     },
     {
+        -- golang debugging
         'leoluz/nvim-dap-go',
         lazy = true,
         ft = "go",
         opts = {},
     },
+    {
+        -- rust debugging
+        'mrcjkb/rustaceanvim',
+        version = '^5', -- Recommended
+        lazy = false, -- This plugin is already lazy
+    }
 }
