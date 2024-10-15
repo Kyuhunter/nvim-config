@@ -6,7 +6,7 @@ vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
 vim.keymap.set('n', 'J', 'mzJ`z')
 
 -- format and stay at current line
-vim.keymap.set('n', '=ap', 'mz=ap`zzz')
+-- vim.keymap.set('n', '=ap', 'mz=ap`zzz')
 
 vim.keymap.set('n', '<C-d>', '<C-d>zz')
 vim.keymap.set('n', '<C-u>', '<C-u>zz')
@@ -19,7 +19,7 @@ vim.keymap.set('n', '<leader>y', '\"+y')
 vim.keymap.set('v', '<leader>y', '\"+y')
 vim.keymap.set('n', '<leader>Y', '\"+Y')
 
-vim.keymap.set('n', 'Q', '<nop>')
+--vim.keymap.set('n', 'Q', '<nop>')
 
 vim.keymap.set('n', '<C-f>', '<cmd>silent !tmux neww tmux-sessionizer<CR>')
 
