@@ -2,10 +2,11 @@ return {
     {
         'nvim-telescope/telescope.nvim', tag = '0.1.8',
         cmd = 'Telescope',
-        lazy = true,
+        lazy = false,
         dependencies = {
             'nvim-lua/plenary.nvim',
             'nvim-telescope/telescope-file-browser.nvim',
+            'nvim-telescope/telescope-live-grep-args.nvim',
         },
         keys = {
             { '<leader>pf', require('telescope.builtin').find_files },
@@ -13,7 +14,7 @@ return {
             { '<leader>ps', function ()
                 require('telescope.builtin').grep_string({ search = vim.fn.input("Grep > ") });
             end },
-            { '<leader>pg', require('telescope.builtin').live_grep },
+            { '<leader>pg', ":lua require('telescope').extensions.live_grep_args.live_grep_args()<CR>" },
             { '<leader>pi', require('telescope.builtin').current_buffer_fuzzy_find },
         },
         config = function()
@@ -54,6 +55,7 @@ return {
             }
 
             telescope.load_extension("file_browser")
+            telescope.load_extension("live_grep_args")
         end,
     },
 }

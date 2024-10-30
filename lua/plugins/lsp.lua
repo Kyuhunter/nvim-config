@@ -7,11 +7,13 @@ return {
     },
     {
         'williamboman/mason.nvim',
-        lazy = false,
+        lazy = true,
         config = true,
+        event = "BufEnter",
     },
     {
         "hrsh7th/cmp-path",
+        event = "InsertEnter",
     },
     {
         'hrsh7th/nvim-cmp',
