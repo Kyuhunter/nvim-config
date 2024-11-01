@@ -24,7 +24,8 @@ return {
             local has_words_before = function()
                 unpack = unpack or table.unpack
                 local line, col = unpack(vim.api.nvim_win_get_cursor(0))
-                return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+                return col ~= 0 and
+                    vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
             end
 
             cmp.setup({
@@ -76,17 +77,17 @@ return {
     {
         'neovim/nvim-lspconfig',
         cmd = { 'LspInfo', 'LspInstall', 'LspStart' },
-        event = {'BufReadPre', 'BufNewFile'},
+        event = { 'BufReadPre', 'BufNewFile' },
         dependencies = {
-            {'hrsh7th/cmp-nvim-lsp'},
-            {'williamboman/mason.nvim'},
-            {'williamboman/mason-lspconfig.nvim'},
+            { 'hrsh7th/cmp-nvim-lsp' },
+            { 'williamboman/mason.nvim' },
+            { 'williamboman/mason-lspconfig.nvim' },
         },
-        config = function ()
+        config = function()
             local lsp_zero = require('lsp-zero')
 
             local lsp_attach = function(client, bufnr)
-                local opts = {buffer = bufnr}
+                local opts = { buffer = bufnr }
 
                 vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
                 vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
@@ -96,7 +97,7 @@ return {
                 vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
                 vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
                 vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
-                vim.keymap.set({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
+                vim.keymap.set({ 'n', 'x' }, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
                 vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
             end
 
@@ -113,6 +114,18 @@ return {
                     -- it applies to every language server without a "custom handler"
                     function(server_name)
                         require('lspconfig')[server_name].setup({})
+                    end,
+
+                    twiggy_language_server = function()
+                        require('lspconfig').twiggy_language_server.setup {
+                            settings = {
+                                twiggy = {
+                                    framework = 'symfony',
+                                    phpExecutable = '/opt/homebrew/bin/php',
+                                    symfonyConsolePath = '/opt/homebrew/bin/symfony',
+                                },
+                            },
+                        }
                     end,
                 }
             })

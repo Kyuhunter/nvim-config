@@ -27,6 +27,7 @@ return {
                 extensions = {
                     file_browser = {
                         hijack_netrw = true,
+                        follow_symlinks = true,
                     }
                 },
                 defaults = {
