@@ -1,4 +1,3 @@
-local vim = vim
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -20,28 +19,21 @@ vim.opt.rtp:prepend(lazypath)
 -- loading lazy.nvim so that mappings are correct.
 -- This is also a good place to setup other settings (vim.opt)
 vim.g.mapleader = " "
-vim.g.maplocalleader = " "
---vim.g.loaded_netrw = 1
---vim.g.loaded_netrwPlugin = 1
-
-require('config.keymaps') -- custom keymaps
-require('config.options') -- custom options
-require('config.autocmds') -- custom autocmds
-require('config.fextensions') -- file type extension mapping
+vim.g.maplocalleader = "\\"
 
 -- Setup lazy.nvim
 require("lazy").setup({
-    defaults = {
-        lazy = true
-    },
-    spec = {
-        -- import your plugins
-        { import = "plugins" },
-    },
-    -- Configure any other settings here. See the documentation for more details.
-    -- colorscheme that will be used when installing plugins.
-    install = { colorscheme = { "habamax" } },
-    -- automatically check for plugin updates
-    -- checker = { enabled = true },
+  spec = {
+    -- import your plugins
+    { import = "plugins" },
+  },
+  -- Configure any other settings here. See the documentation for more details.
+  -- colorscheme that will be used when installing plugins.
+  install = { colorscheme = { "rose-pine" } },
+  -- automatically check for plugin updates
+  checker = { enabled = false },
 })
 
+require('config.keymaps')
+require('config.options')
+require('config.autocmds')
