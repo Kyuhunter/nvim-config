@@ -1,137 +1,29 @@
 return {
     {
-        "rose-pine/neovim",
-        name = "rose-pine",
-        lazy = false,
-        priority = 1000,
-        config = function() vim.cmd([[colorscheme rose-pine]]) end
-    }, {
         'nvim-treesitter/nvim-treesitter',
         lazy = false,
         branch = 'main',
         build = ':TSUpdate'
-    }, {
-        'lewis6991/gitsigns.nvim',
-        event = "VeryLazy",
-        opts = {
-            on_attach = function(bufnr)
-                local gitsigns = require('gitsigns')
-
-                local function map(mode, l, r, opts)
-                    opts = opts or {}
-                    opts.buffer = bufnr
-                    vim.keymap.set(mode, l, r, opts)
-                end
-
-                -- Navigation
-                map('n', ']c', function()
-                    if vim.wo.diff then
-                        vim.cmd.normal({']c', bang = true})
-                    else
-                        gitsigns.nav_hunk('next')
-                    end
-                end)
-
-                map('n', '[c', function()
-                    if vim.wo.diff then
-                        vim.cmd.normal({'[c', bang = true})
-                    else
-                        gitsigns.nav_hunk('prev')
-                    end
-                end)
-
-                -- Actions
-                map('n', '<leader>hs', gitsigns.stage_hunk)
-                map('n', '<leader>hr', gitsigns.reset_hunk)
-
-                map('v', '<leader>hs', function()
-                    gitsigns.stage_hunk({vim.fn.line('.'), vim.fn.line('v')})
-                end)
-
-                map('v', '<leader>hr', function()
-                    gitsigns.reset_hunk({vim.fn.line('.'), vim.fn.line('v')})
-                end)
-
-                map('n', '<leader>hS', gitsigns.stage_buffer)
-                map('n', '<leader>hR', gitsigns.reset_buffer)
-                map('n', '<leader>hp', gitsigns.preview_hunk)
-                map('n', '<leader>hi', gitsigns.preview_hunk_inline)
-
-                map('n', '<leader>hb',
-                    function() gitsigns.blame_line({full = true}) end)
-
-                map('n', '<leader>hd', gitsigns.diffthis)
-
-                map('n', '<leader>hD', function()
-                    gitsigns.diffthis('~')
-                end)
-
-                map('n', '<leader>hQ', function()
-                    gitsigns.setqflist('all')
-                end)
-                map('n', '<leader>hq', gitsigns.setqflist)
-
-                -- Toggles
-                map('n', '<leader>tb', gitsigns.toggle_current_line_blame)
-                map('n', '<leader>tw', gitsigns.toggle_word_diff)
-
-                -- Text object
-                map({'o', 'x'}, 'ih', gitsigns.select_hunk)
-            end
-        }
-    }, {
-        'nvim-lualine/lualine.nvim',
-        event = "BufEnter",
-        dependencies = {'nvim-tree/nvim-web-devicons'},
-        opts = {
-            opts = {
-                function(_, opts)
-                    local trouble = require("trouble")
-                    local symbols = trouble.statusline({
-                        mode = "lsp_document_symbols",
-                        groups = {},
-                        title = false,
-                        filter = {range = true},
-                        format = "{kind_icon}{symbol.name:Normal}",
-                        -- The following line is needed to fix the background color
-                        -- Set it to the lualine section you want to use
-                        hl_group = "lualine_c_normal"
-                    })
-                    table.insert(opts.sections.lualine_c,
-                                 {symbols.get, cond = symbols.has})
-                end
-            }
-        }
-    }, {"Bilal2453/luvit-meta", lazy = true}, -- optional `vim.uv` typings
+    },  {"Bilal2453/luvit-meta", lazy = true}, -- optional `vim.uv` typings
     {
-        "wintermute-cell/gitignore.nvim",
-        cmd = "Gitignore",
-        config = function() require('gitignore') end
-    }, {
         "folke/todo-comments.nvim",
         dependencies = {"nvim-lua/plenary.nvim"},
         opts = {},
         event = "VeryLazy"
-    }, {
+    },  {
         'stevearc/oil.nvim',
         ---@module 'oil'
         ---@type oil.SetupOpts
-        opts = {columns = {"icon"}},
-        -- Optional dependencies
+        opts = {watch_for_changes = true},
+        -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
         lazy = false,
-        keys = {{"<leader>pv", ":Oil<CR>"}}
-    }, {
-        'nvim-mini/mini.nvim',
-        version = '*',
-        config = function()
-            require('mini.pick').setup({})
-            require('mini.snippets').setup({})
-            require('mini.icons').setup({})
-        end,
-        keys = {
-            {"<leader>pf", ":Pick files<CR>"},
-            {"<leader>pg", ":Pick grep_live<CR>"}
-        }
+        init = function()
+            vim.keymap.set("n", "<leader>pv", "<cmd>Oil<CR>",
+                           {desc = "Open Oil in current buffer"})
+            vim.keymap.set("n", "-", "<cmd>Oil<CR>",
+                           {desc = "Open Oil in current Buffer"})
+
+        end
     }, {
         'sbdchd/neoformat',
         cmd = {"Neoformat"},
@@ -159,7 +51,7 @@ return {
                 pattern = {
                     "*.js", "*.jsx", "*.ts", "*.tsx", "*.json", "*.jsonc",
                     "*.yml", "*.yaml", "*.md", "*.html", "*.css", "*.scss",
-                    "*.less", "*.graphql"
+                    "*.less", "*.graphql", "*.lua"
                 },
                 callback = function()
                     -- silent! avoids noise if a filetype isn’t configured
@@ -180,7 +72,7 @@ return {
         dependencies = {
             {"mason-org/mason.nvim", opts = {}}, "neovim/nvim-lspconfig"
         }
-    }, {
+    }, {"folke/lazydev.nvim", ft = "lua"}, {
         'saghen/blink.nvim',
         build = 'cargo build --release', -- for delimiters
         keys = {
@@ -207,7 +99,7 @@ return {
     }, {
         'saghen/blink.cmp',
         -- optional: provides snippets for the snippet source
-        dependencies = {'rafamadriz/friendly-snippets'},
+        dependencies = {'rafamadriz/friendly-snippets', "onsails/lspkind.nvim"},
 
         -- use a release tag to download pre-built binaries
         version = '1.*',
@@ -219,7 +111,7 @@ return {
         ---@module 'blink.cmp'
         ---@type blink.cmp.Config
         opts = {
-            -- 'de}fault' (recommended) for mappings similar to built-in completions (C-y to accept)
+            -- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
             -- 'super-tab' for mappings similar to vscode (tab to accept)
             -- 'enter' for enter to accept
             -- 'none' for no mappings
@@ -231,28 +123,85 @@ return {
             -- C-k: Toggle signature help (if signature.enabled = true)
             --
             -- See :h blink-cmp-config-keymap for defining your own keymap
-            keymap = {preset = 'enter'},
+            keymap = {preset = 'super-tab'},
 
-            appearance = {
-                -- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-                -- Adjusts spacing to ensure icons are aligned
-                nerd_font_variant = 'mono'
+            appearance = {nerd_font_variant = 'mono'},
+
+            completion = {
+                documentation = {auto_show = true},
+                menu = {
+                    draw = {
+                        components = {
+                            kind_icon = {
+                                text = function(ctx)
+                                    if vim.tbl_contains({"Path"},
+                                                        ctx.source_name) then
+                                        local mini_icon, _ = require(
+                                                                 "mini.icons").get_icon(
+                                                                 ctx.item.data
+                                                                     .type,
+                                                                 ctx.label)
+                                        if mini_icon then
+                                            return mini_icon .. ctx.icon_gap
+                                        end
+                                    end
+
+                                    local icon =
+                                        require("lspkind").symbolic(ctx.kind, {
+                                            mode = "symbol"
+                                        })
+                                    return icon .. ctx.icon_gap
+                                end,
+
+                                highlight = function(ctx)
+                                    if vim.tbl_contains({"Path"},
+                                                        ctx.source_name) then
+                                        local mini_icon, mini_hl = require(
+                                                                       "mini.icons").get_icon(
+                                                                       ctx.item
+                                                                           .data
+                                                                           .type,
+                                                                       ctx.label)
+                                        if mini_icon then
+                                            return mini_hl
+                                        end
+                                    end
+                                    return ctx.kind_hl
+                                end
+                            },
+                            kind = {
+                                highlight = function(ctx)
+                                    if vim.tbl_contains({"Path"},
+                                                        ctx.source_name) then
+                                        local mini_icon, mini_hl = require(
+                                                                       "mini.icons").get_icon(
+                                                                       ctx.item
+                                                                           .data
+                                                                           .type,
+                                                                       ctx.label)
+                                        if mini_icon then
+                                            return mini_hl
+                                        end
+                                    end
+                                    return ctx.kind_hl
+                                end
+                            }
+                        }
+                    }
+                }
             },
-
-            -- (Default) Only show the documentation popup when manually triggered
-            completion = {documentation = {auto_show = false}},
-
-            -- Default list of enabled providers defined so that you can extend it
-            -- elsewhere in your config, without redefining it, due to `opts_extend`
-            sources = {default = {'lsp', 'path', 'snippets', 'buffer'}},
-
-            -- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
-            -- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
-            -- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
-            --
-            -- See the fuzzy documentation for more information
+            sources = {
+                default = {'lazydev', 'lsp', 'path', 'snippets', 'buffer'},
+                providers = {
+                    lazydev = {
+                        name = "LazyDev",
+                        module = "lazydev.integrations.blink",
+                        score_offset = 100
+                    }
+                }
+            },
             fuzzy = {implementation = "prefer_rust_with_warning"}
         },
         opts_extend = {"sources.default"}
-    }, {"tpope/vim-fugitive"}
+    }
 }

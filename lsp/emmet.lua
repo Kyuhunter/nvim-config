@@ -4,7 +4,7 @@ return {
     filetypes = {
         'css', 'eruby', 'html', 'htmlangular', 'htmldjango',
         'javascriptreact', 'less', 'pug', 'sass', 'scss', 'svelte', 'templ',
-        'typescriptreact', 'vue', 'lua'
+        'typescriptreact', 'vue'
      },
     root_markers = {'.git'},
     init_options = {preferences = {["profile.allowCompactBoolean"] = true}}
