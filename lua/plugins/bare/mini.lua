@@ -13,5 +13,6 @@ return {
         require('mini.basics').setup({})
         require('mini.extra').setup({})
         require('mini.surround').setup({})
+        require('mini.comment').setup({})
     end
 }

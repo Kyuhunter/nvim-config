@@ -35,7 +35,3 @@ spec = {
     -- automatically check for plugin updates
     checker = {enabled = false}
 })
-
-require('config.keymaps')
-require('config.options')
-require('config.autocmds')
