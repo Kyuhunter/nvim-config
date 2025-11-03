@@ -1,0 +1,38 @@
+vim.lsp.config('angularls', {
+    -- before_init = function(params, config)
+    --     local root_dir = config.root_dir
+    --     if not root_dir then return end
+    --
+    --     -- Just check if package.json exists and contains angular - very fast
+    --     local package_json_path = root_dir .. '/package.json'
+    --     if vim.fn.filereadable(package_json_path) == 1 then
+    --         -- Read just the first few lines to check for Angular
+    --         local lines = vim.fn.readfile(package_json_path, '', 10) -- read first 10 lines
+    --         local content = table.concat(lines, ' ')
+    --         if content:find('@angular/core') then
+    --             -- Defer the actual installation check and install
+    --             vim.defer_fn(function()
+    --                 local lang_service_path = root_dir ..
+    --                                               '/node_modules/@angular/language-service/package.json'
+    --                 if vim.fn.filereadable(lang_service_path) == 0 then
+    --                     vim.notify('Installing @angular/language-service...',
+    --                                vim.log.levels.INFO)
+    --                     vim.fn.jobstart(
+    --                         'npm install --save-dev @angular/language-service@latest',
+    --                         {
+    --                             cwd = root_dir,
+    --                             on_exit = function(_, code)
+    --                                 if code == 0 then
+    --                                     vim.notify(
+    --                                         'Language service installed. Restarting...',
+    --                                         vim.log.levels.INFO)
+    --                                     vim.cmd('LspRestart angularls')
+    --                                 end
+    --                             end
+    --                         })
+    --                 end
+    --             end, 2000) -- Wait 2 seconds after startup to avoid slowdown
+    --         end
+    --     end
+    -- end
+})

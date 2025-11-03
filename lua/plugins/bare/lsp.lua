@@ -10,10 +10,7 @@ return {
         "mason-org/mason-lspconfig.nvim",
         opts = {
             automatic_enable = {
-                exclude = {
-                    "emmet_language_server", "java", "java_language_server",
-                    "jdtls"
-                }
+                exclude = {"java", "java_language_server", "jdtls"}
             }
         },
         dependencies = {
