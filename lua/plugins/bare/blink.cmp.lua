@@ -6,7 +6,7 @@ return {
             'rafamadriz/friendly-snippets', "onsails/lspkind.nvim",
             "nvim-mini/mini.nvim"
         },
-
+        event = "InsertEnter",
         -- use a release tag to download pre-built binaries
         version = '1.*',
         -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust

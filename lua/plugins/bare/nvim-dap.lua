@@ -27,28 +27,25 @@ return {
             }
         }
     },
-    keys = function()
-        local dap = require("dap")
-        return {
-            {
-                "<F1>",
-                function()
-                    require("dap.ui.widgets").hover(nil, {border = "rounded"})
-                end,
-                desc = "DAP Hover"
-            }, {"<F4>", "<CMD>DapTerminate<CR>", desc = "DAP Terminate"},
-            {'<F5>', dap.continue, desc = "DAP continue"},
-            {
-                "<F6>",
-                function() require("dap").run_to_cursor() end,
-                desc = "Run to Cursor"
-            }, {'<F10>', dap.step_over, desc = "Step Over"},
-            {"<F11>", dap.step_into, desc = "Step Into"},
-            {"<F12>", dap.step_out, desc = "Step Out"},
-            {'<leader>b', dap.toggle_breakpoint, desc = "Toggle Breakpoint"},
-            {'<leader>dd', ':lua require"dapui".toggle()<CR>'}
-        }
-    end,
+    keys = {
+        {
+            "<F1>",
+            function()
+                require("dap.ui.widgets").hover(nil, {border = "rounded"})
+            end,
+            desc = "DAP Hover"
+        }, {"<F4>", "<cmd>DapTerminate<cr>", desc = "DAP Terminate"},
+        {"<F5>", "<cmd>DapContinue<cr>", desc = "DAP continue"},
+        {"<F6>", "<cmd>DapRunToCursor<cr>", desc = "Run to Cursor"},
+        {"<F10>", "<cmd>DapStepOver<cr>", desc = "Step Over"},
+        {"<F11>", "<cmd>DapStepInto<cr>", desc = "Step Into"},
+        {"<F12>", "<cmd>DapStepOut<cr>", desc = "Step Out"},
+        {
+            "<leader>b",
+            "<cmd>DapToggleBreakpoint<cr>",
+            desc = "Toggle Breakpoint"
+        }, {"<leader>dd", "<cmd>DapUIToggle<cr>", desc = "Toggle DAP UI"}
+    },
     config = function()
         local present_virtual_text, dap_vt = pcall(require,
                                                    "nvim-dap-virtual-text")

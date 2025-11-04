@@ -6,15 +6,16 @@ return {
     opts = {
         bigfile = {enabled = true},
         image = {enabled = true},
-        indent = {
-            enabled = true,
-            animate = {
-                enabled = false
-            }
-        },
+        indent = {enabled = true, animate = {enabled = false}},
+        input = {enabled = true},
         notifier = {enabled = true, timeout = 3000},
         quickfile = {enabled = true},
         rename = {enabled = true},
+        statuscolumn = {
+            enabled = true,
+            left = {"git", "mark"},
+            right = {"fold", "sign"}
+        },
         styles = {
             notification = {
                 -- wo = { wrap = true } -- Wrap notifications
