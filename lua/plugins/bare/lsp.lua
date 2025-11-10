@@ -8,6 +8,7 @@ return {
         end
     }, {
         "mason-org/mason-lspconfig.nvim",
+        event = "VeryLazy",
         opts = {
             automatic_enable = {
                 exclude = {"java", "java_language_server", "jdtls"}

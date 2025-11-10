@@ -16,6 +16,8 @@ return {
                 -- Things that should not be italic..
                 ["@variable"] = {italic = false},
                 ["@property"] = {italic = false},
+                ["lsp.typemod.string.defaultLibrary.lua"] = {italic = false},
+                ["@spell"] = {italic = false},
             }
 
         })
