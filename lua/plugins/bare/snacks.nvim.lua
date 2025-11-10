@@ -8,7 +8,6 @@ return {
         image = {enabled = true},
         indent = {enabled = true, animate = {enabled = false}},
         input = {enabled = true},
-        notifier = {enabled = true, timeout = 3000},
         quickfile = {enabled = true},
         rename = {enabled = true},
         statuscolumn = {
@@ -16,11 +15,7 @@ return {
             left = {"git", "mark"},
             right = {"fold", "sign"}
         },
-        styles = {
-            notification = {
-                -- wo = { wrap = true } -- Wrap notifications
-            }
-        }
+        styles = {}
     },
     init = function()
         vim.api.nvim_create_autocmd("User", {
