@@ -1,4 +1,5 @@
-vim.lsp.config('angularls', {
+---@type vim.lsp.Config
+return {
     before_init = function(params, config)
         local root_dir = config.root_dir
         if not root_dir then return end
@@ -29,4 +30,4 @@ vim.lsp.config('angularls', {
             end
         end
     end
-})
+}
