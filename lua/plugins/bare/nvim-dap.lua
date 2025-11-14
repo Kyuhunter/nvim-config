@@ -44,7 +44,12 @@ return {
             "<leader>b",
             "<cmd>DapToggleBreakpoint<cr>",
             desc = "Toggle Breakpoint"
-        }, {"<leader>dd", "<cmd>DapUIToggle<cr>", desc = "Toggle DAP UI"}
+        },
+        {
+            "<leader>dd",
+            "<cmd>lua require'dapui'.toggle()<cr>",
+            desc = "Toggle DAP UI"
+        }
     },
     config = function()
         local present_virtual_text, dap_vt = pcall(require,
