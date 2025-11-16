@@ -14,7 +14,7 @@ return {
     },
     { "mfussenegger/nvim-jdtls", dependencies = { "nvim-dap" }, ft = "java", opts = {} },
     {
-        "oclay1st/gradle.nvim",
+        "Kyuhunter/gradle.nvim",
         cmd = { "Gradle", "GradleExec", "GradleInit", "GradleFavorites" },
         dependencies = {
             "nvim-lua/plenary.nvim",

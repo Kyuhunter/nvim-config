@@ -18,6 +18,11 @@ return {
 				-- LuaFormatter on
 			},
 		},
+		format_on_save = {
+			-- These options will be passed to conform.format()
+			timeout_ms = 500,
+			lsp_format = "fallback",
+		},
 	},
 	config = function()
 		vim.api.nvim_create_user_command("Format", function(args)
