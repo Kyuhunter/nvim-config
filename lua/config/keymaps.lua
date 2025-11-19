@@ -1,29 +1,39 @@
--- move line up and down, auto indent
-vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
-vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv")
-
-vim.keymap.set('n', 'J', 'mzJ`z')
-
--- format and stay at current line
--- vim.keymap.set('n', '=ap', 'mz=ap`zzz')
-
-vim.keymap.set('n', '<C-d>', '<C-d>zz')
-vim.keymap.set('n', '<C-u>', '<C-u>zz')
-vim.keymap.set('n', 'n', 'nzzzv')
-vim.keymap.set('n', 'N', 'Nzzzv')
-
-vim.keymap.set('x', '<leader>p', '\"_dP')
-
-vim.keymap.set('n', '<leader>y', '\"+y')
-vim.keymap.set('n', '<leader>Y', '\"+Y')
-vim.keymap.set('v', '<leader>y', '\"+y')
-
--- vim.keymap.set('n', 'Q', '<nop>')
-
-vim.keymap.set("n", "<leader>s",
-               [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
-vim.keymap.set("n", "<leader>mx", "<cmd>!chmod +x %<CR>", {silent = true})
-
-vim.keymap.set("n", "<C-->", "-")
-
-vim.keymap.set("v", "<leader>M", "<cmd>YankMarkdown<CR>")
+local wk = require("which-key")
+wk.add({
+	{
+		{ "<leader>y", '"+y', desc = "yank to clipboard" },
+		{ "<leader>Y", '"+Y', desc = "yank to EOL to clipboard" },
+		{
+			"<leader>y",
+			'"+y',
+			desc = "yank to clipboard",
+			mode = "v",
+		},
+		{ "<C-d>", "<C-d>zz", desc = "Page Down (centered)" },
+		{ "<C-u>", "<C-u>zz", desc = "Page Up (centered)" },
+		{
+			"n",
+			"nzzzv",
+			desc = "next search result",
+			group = "Navigation",
+		},
+		{
+			"N",
+			"Nzzzv",
+			desc = "previous search result",
+			group = "Navigation",
+		},
+		{
+			"<leader>s",
+			[[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
+			desc = "search and replace under cursor",
+		},
+		{ "<leader>mx", "<cmd>!chmod +x %<CR>", desc = "make current file executable", { silent = true } },
+	},
+	{
+		{ mode = "v" },
+		{ "J", ":m '>+1<CR>gv=gv", desc = "move line down (autoindent)" },
+		{ "K", ":m '<-2<CR>gv=gv", desc = "move line up (autoindent)" },
+		{ "<leader>M", "<cmd>YankMarkdown<CR>", desc = "Yank as Markdown" },
+	},
+})
