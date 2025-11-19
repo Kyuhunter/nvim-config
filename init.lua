@@ -6,5 +6,6 @@ require("config.options")
 require("config.autocmds")
 require("config.keymaps")
 require("config.fextensions")
+require("config.usercommands")
 
 vim.lsp.enable("jdtls")

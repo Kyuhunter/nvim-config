@@ -11,4 +11,3 @@ autocmd("FileType", {
     desc = "Disable newline comments when inserting lines with o/O",
     callback = function() vim.opt_local.formatoptions:remove("o") end
 })
-
