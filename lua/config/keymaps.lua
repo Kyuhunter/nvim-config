@@ -25,3 +25,5 @@ vim.keymap.set("n", "<leader>s",
 vim.keymap.set("n", "<leader>mx", "<cmd>!chmod +x %<CR>", {silent = true})
 
 vim.keymap.set("n", "<C-->", "-")
+
+vim.keymap.set("v", "<leader>M", "<cmd>YankMarkdown<CR>")
