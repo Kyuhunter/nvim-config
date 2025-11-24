@@ -31,7 +31,7 @@ wk.add({
 		{ "<leader>mx", "<cmd>!chmod +x %<CR>", desc = "make current file executable", { silent = true } },
 	},
 	{
-		{ mode = "v" },
+		mode = "v",
 		{ "J", ":m '>+1<CR>gv=gv", desc = "move line down (autoindent)" },
 		{ "K", ":m '<-2<CR>gv=gv", desc = "move line up (autoindent)" },
 		{ "<leader>M", "<cmd>YankMarkdown<CR>", desc = "Yank as Markdown" },
