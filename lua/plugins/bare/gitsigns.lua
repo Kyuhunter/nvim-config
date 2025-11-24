@@ -8,11 +8,11 @@ return {
 
 			whichkey.add({
 				buffer = bufnr,
-				group = "Gitsigns",
 				icon = {
 					icon = "",
 					color = "orange",
 				},
+				{ "<leader>h", group = "Gitsigns" },
 				{
 					"]c",
 					function()

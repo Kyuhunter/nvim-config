@@ -14,13 +14,13 @@ return {
 		},
 	},
 	keys = {
-        {
-            "<leader>dh",
-            function ()
-               require("doodle"):here()
-            end,
-            desc = "Doodle Here"
-        },
+		{
+			"<leader>dh",
+			function()
+				require("doodle"):here()
+			end,
+			desc = "Doodle Here",
+		},
 		{
 			"<leader>dv",
 			function()
@@ -50,4 +50,16 @@ return {
 			desc = "Doodle Graph View",
 		},
 	},
+	config = function()
+		local whichkey = require("which-key")
+		whichkey.add({
+			icon = {
+				icon = "󱞂",
+			},
+			{
+				"<leader>d",
+				group = "Doodle",
+			},
+		})
+	end,
 }
