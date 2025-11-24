@@ -7,10 +7,12 @@ return {
 			local whichkey = require("which-key")
 
 			whichkey.add({
-                icon = {
-                    icon = "",
-                    color = "orange",
-                },
+				buffer = bufnr,
+				group = "Gitsigns",
+				icon = {
+					icon = "",
+					color = "orange",
+				},
 				{
 					"]c",
 					function()
@@ -31,7 +33,7 @@ return {
 							gitsigns.nav_hunk("prev")
 						end
 					end,
-                    desc = "Previous Hunk"
+					desc = "Previous Hunk",
 				},
 				{
 					"<leader>hs",
@@ -39,7 +41,7 @@ return {
 						gitsigns.stage_hunk()
 					end,
 					mode = "v",
-                    desc = "Stage Hunk"
+					desc = "Stage Hunk",
 				},
 				{
 					"<leader>hr",
@@ -47,84 +49,84 @@ return {
 						gitsigns.reset_hunk()
 					end,
 					mode = "v",
-                    desc = "Reset Hunk"
+					desc = "Reset Hunk",
 				},
 				{
 					"<leader>hs",
 					function()
 						gitsigns.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
 					end,
-                    desc = "Stage Selection"
+					desc = "Stage Selection",
 				},
 				{
 					"<leader>hr",
 					function()
 						gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
 					end,
-                    desc = "Reset Selection"
+					desc = "Reset Selection",
 				},
 				{
 					"<leader>hS",
 					function()
 						gitsigns.stage_buffer()
 					end,
-                    desc = "Stage Buffer"
+					desc = "Stage Buffer",
 				},
 				{
 					"<leader>hR",
 					function()
 						gitsigns.reset_buffer()
 					end,
-                    desc = "Reset Buffer"
+					desc = "Reset Buffer",
 				},
 				{
 					"<leader>hp",
 					function()
 						gitsigns.preview_hunk()
 					end,
-                    desc = "Preview Hunk"
+					desc = "Preview Hunk",
 				},
 				{
 					"<leader>hi",
 					function()
 						gitsigns.preview_hunk_inline()
 					end,
-                    desc = "Preview Hunk Inline"
+					desc = "Preview Hunk Inline",
 				},
 				{
 					"<leader>hb",
 					function()
 						gitsigns.blame_line({ full = true })
 					end,
-                    desc = "Blame Line"
+					desc = "Blame Line",
 				},
 				{
 					"<leader>hd",
 					function()
 						gitsigns.diffthis()
 					end,
-                    desc = "Diff Against Index"
+					desc = "Diff Against Index",
 				},
 				{
 					"<leader>hD",
 					function()
 						gitsigns.diffthis("~")
 					end,
-                    desc = "Diff Against Prev Commit"
+					desc = "Diff Against Prev Commit",
 				},
 				{
 					"<leader>hQ",
 					function()
 						gitsigns.setqflist("all")
 					end,
-                    desc = "All to QickFix"
+					desc = "All to QickFix",
 				},
 				{
 					"<leader>hq",
 					function()
 						gitsigns.setqflist()
 					end,
-                    desc = "Buffer to QickFix"
+					desc = "Buffer to QickFix",
 				},
 				-- Toggles
 				{
@@ -132,14 +134,14 @@ return {
 					function()
 						gitsigns.toggle_current_line_blame()
 					end,
-                    desc = "Toggle Current Line Blame"
+					desc = "Toggle Current Line Blame",
 				},
 				{
 					"\\tw",
 					function()
 						gitsigns.toggle_word_diff()
 					end,
-                    desc = "Toggle Word Diff"
+					desc = "Toggle Word Diff",
 				},
 				-- Text object
 				{
@@ -148,7 +150,7 @@ return {
 						gitsigns.select_hunk()
 					end,
 					mode = { "o", "x" },
-                    desc = "Select Current Hunk"
+					desc = "Select Current Hunk",
 				},
 			})
 		end,
