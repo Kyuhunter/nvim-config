@@ -2,9 +2,16 @@ return {
 	{
 		"olrtg/nvim-emmet",
 		event = "InsertEnter",
-		config = function()
-			vim.keymap.set({ "n", "v" }, "<leader>xe", require("nvim-emmet").wrap_with_abbreviation)
-		end,
+		keys = {
+			{
+				"<leader>xe",
+				function()
+					require("nvim-emmet").wrap_with_abbreviation()
+				end,
+                desc = "Wrap With Abbreviation",
+				mode = { "n", "v" },
+			},
+		},
 	},
 	{
 		"mason-org/mason-lspconfig.nvim",
@@ -20,14 +27,14 @@ return {
 		},
 	},
 	{ "folke/lazydev.nvim", ft = "lua" },
-    {
-        'WhoIsSethDaniel/mason-tool-installer.nvim',
-        dependencies = "mason-org/mason.nvim",
-        opts = {
+	{
+		"WhoIsSethDaniel/mason-tool-installer.nvim",
+		dependencies = "mason-org/mason.nvim",
+		opts = {
 			-- LuaFormatter off
 			ensure_installed = {
 				-- Formatting
-                "prettierd",
+				"prettierd",
 				-- Lua
 				"lua_ls",
 				"luaformatter",
@@ -35,7 +42,7 @@ return {
 				"jdtls",
 				"java-debug-adapter",
 				"java-test",
-                "checkstyle",
+				"checkstyle",
 				-- Angular
 				"angularls",
 				"ts_ls",
@@ -43,6 +50,6 @@ return {
 				"eslint",
 			},
 			-- LuaFormatter on
-        },
-    }
+		},
+	},
 }
