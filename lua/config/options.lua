@@ -27,8 +27,8 @@ vim.opt.isfname:append("@-@")
 vim.opt.updatetime = 50
 
 vim.opt.colorcolumn = "80,100"
-vim.opt.filetype = 'on'
+vim.opt.filetype = "on"
 
 vim.cmd("filetype plugin on")
 
-vim.o.winborder = 'rounded'
+vim.o.winborder = "rounded"
