@@ -8,7 +8,7 @@ return {
 				function()
 					require("nvim-emmet").wrap_with_abbreviation()
 				end,
-                desc = "Wrap With Abbreviation",
+				desc = "Wrap With Abbreviation",
 				mode = { "n", "v" },
 			},
 		},
@@ -34,6 +34,7 @@ return {
 			-- LuaFormatter off
 			ensure_installed = {
 				-- Formatting
+				"biome",
 				"prettierd",
 				-- Lua
 				"lua_ls",

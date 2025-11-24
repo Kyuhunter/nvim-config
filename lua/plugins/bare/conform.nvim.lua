@@ -4,7 +4,7 @@ return {
 		formatters_by_ft = {
 			lua = { "luaformat" },
 			-- Conform will run the first available formatter
-			javascript = { "prettierd", "prettier", stop_after_first = true },
+			javascript = { "biome", stop_after_first = true },
 		},
 		formatters = {
 			luaformat = {
