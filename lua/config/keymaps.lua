@@ -24,7 +24,7 @@ wk.add({
 			group = "Navigation",
 		},
 		{
-			"<leader>s",
+			"<leader>S",
 			[[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
 			desc = "search and replace under cursor",
 		},
