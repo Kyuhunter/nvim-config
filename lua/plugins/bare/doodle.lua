@@ -50,7 +50,7 @@ return {
 			desc = "Doodle Graph View",
 		},
 	},
-	config = function()
+	init = function()
 		local whichkey = require("which-key")
 		whichkey.add({
 			icon = {
