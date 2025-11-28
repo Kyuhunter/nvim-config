@@ -32,3 +32,5 @@ vim.opt.filetype = "on"
 vim.cmd("filetype plugin on")
 
 vim.o.winborder = "rounded"
+
+vim.opt.spelllang = { "de_20", "en" }
