@@ -5,6 +5,7 @@ return {
 		"nvim-lua/plenary.nvim",
 		"nvim-telescope/telescope.nvim",
 	},
+    lazy = true,
 	opts = {
 		settings = {
 			-- This is the only required setting for sync to work.
