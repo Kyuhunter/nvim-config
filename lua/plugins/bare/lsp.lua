@@ -49,6 +49,8 @@ return {
 				"ts_ls",
 				"emmet_language_server",
 				"eslint",
+                -- C / C++
+                "clangd",
 			},
 			-- LuaFormatter on
 		},

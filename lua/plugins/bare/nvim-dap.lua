@@ -69,5 +69,7 @@ return {
 		require("plugins.dap.js-debug-adapter")
 		-- Python
 		require("plugins.dap.debugpy")
+        -- C, C++
+        require("plugins.dap.clang-dap-")
 	end,
 }
