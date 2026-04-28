@@ -52,7 +52,7 @@ opt.undolevels = 10000
 opt.undodir = vim.fn.stdpath("state") .. "/undo" -- Undo directory
 opt.updatetime = 300 -- Faster completion
 opt.timeoutlen = vim.g.vscode and 1000 or 300 -- Lower than default (1000) to quickly trigger which-key
-opt.ttimeoutlen = 0 -- Key code timeout
+opt.ttimeoutlen = 10 -- Key code timeout
 opt.autoread = true -- Auto reload files changed outside vim
 opt.autowrite = true -- Auto save
 
