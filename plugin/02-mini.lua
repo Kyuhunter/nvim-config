@@ -1,8 +1,14 @@
-vim.pack.add({ "https://github.com/nvim-mini/mini.nvim" })
+vim.pack.add({
+    "https://github.com/nvim-mini/mini.nvim",
+    "https://github.com/rafamadriz/friendly-snippets",
+})
 
 local wk = require("which-key")
 
-require("mini.snippets").setup({})
+local gen_loader = require("mini.snippets").gen_loader
+require("mini.snippets").setup({
+    snippets = { gen_loader.from_lang() },
+})
 require("mini.icons").setup({})
 require("mini.pairs").setup({})
 require("mini.basics").setup({})
