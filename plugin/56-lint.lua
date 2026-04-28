@@ -6,7 +6,7 @@ local checkstyle_config = os.getenv("HOME") .. "/.config/nvim/linter_configs/goo
 
 local lint = require("lint")
 
-lint.events = {
+local events = {
     "BufWritePost", "BufReadPost", "InsertLeave"
 }
 lint.linters_by_ft = {
@@ -29,7 +29,7 @@ function M.debounce(ms, fn)
     end
 end
 
-vim.api.nvim_create_autocmd(lint.events, {
+vim.api.nvim_create_autocmd(events, {
     group = vim.api.nvim_create_augroup("nvim-lint", { clear = true }),
     callback = M.debounce(100, function()
         if vim.bo.buftype == "" and vim.api.nvim_buf_get_name(0) ~= "" then
