@@ -129,6 +129,9 @@ Stand: 28. April 2026. Sortiert nach Schweregrad. Verifiziert für Neovim 0.12.x
 **Fix-Vorschlag:** Loader konfigurieren oder Setup entfernen.
 **Anleitung für KI-Agent:** Wenn Snippets gewünscht: `local gen_loader = require("mini.snippets").gen_loader; require("mini.snippets").setup({ snippets = { gen_loader.from_file(...), gen_loader.from_lang() } })`. Sonst Zeile entfernen.
 
+=> nutze from_lang()
+=> nutze auch dieses Plugin für snippets: https://github.com/rafamadriz/friendly-snippets
+
 ---
 
 ### 21. `dap.providers.configs.jdtls = nil` redundant gesetzt
