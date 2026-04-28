@@ -30,3 +30,12 @@ require("mason-tool-installer").setup({
   -- LuaFormatter on
 })
 
+vim.lsp.enable({
+    "lua_ls",
+    "angularls",
+    "ts_ls",
+    "emmet_language_server",
+    "eslint",
+    "clangd",
+})
+
