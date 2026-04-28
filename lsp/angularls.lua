@@ -26,7 +26,7 @@ return {
                 vim.notify("@angular/language-service installed successfully",
                            vim.log.levels.INFO)
                 vim.defer_fn(function()
-                    vim.fn.jobstart(vim.cmd(":LspRestart"))
+                    vim.cmd("LspRestart")
                 end, 3000)
             end
         end
