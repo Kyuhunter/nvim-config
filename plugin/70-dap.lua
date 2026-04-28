@@ -17,7 +17,7 @@ require("lazydev").setup({
 local wk = require("which-key")
 local function dap_continue()
     if vim.bo.filetype == "java" then
-        local ok, jdtls_dap = pcall(require, "dap.jdtls")
+        local ok, jdtls_dap = pcall(require, "config.dap.jdtls")
         if ok then
             jdtls_dap.ensure_adapter()
             jdtls_dap.ensure_configs()
@@ -44,9 +44,9 @@ wk.add({
     { "<F24>",     function() require("dapui").toggle() end, desc = "Toggle DAP UI" },
 })
 
-require("dap.virtual-text")
+require("config.dap.virtual-text")
 require("config.dap_ui")
-require("dap.clang")
-require("dap.debugpy")
-require("dap.js-debug-adapter")
-require("dap.jdtls")
+require("config.dap.clang")
+require("config.dap.debugpy")
+require("config.dap.js-debug-adapter")
+require("config.dap.jdtls")
