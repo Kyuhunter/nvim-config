@@ -13,85 +13,79 @@ Stand: 28. April 2026. Sortiert nach Schweregrad. Verifiziert für Neovim 0.12.x
 
 ---
 
-### 4. `lualine.setup` falsch konfiguriert
-**Beschreibung:** `plugin/99-lualine.lua` ruft `require("lualine").setup({ opts = { function(_, opts) ... end } })` auf. Das `{ opts = function(...) }` Format ist ein **lazy.nvim**-Pattern, nicht das von lualine. Lualine erwartet die Konfiguration direkt als Tabelle (mit `sections`, `options`, etc.).
-**Begründung:** Die Trouble-Symbol-Integration in der Statuszeile passiert nie; lualine startet mit Defaults.
-**Fix-Vorschlag:** Konfig flach schreiben — Trouble-Symbole als zusätzlichen `lualine_c` Eintrag.
-**Anleitung für KI-Agent:** In `plugin/99-lualine.lua`: Setze die `symbols` außerhalb von `setup`, dann `require("lualine").setup({ sections = { lualine_c = { 'filename', { symbols.get, cond = symbols.has } } } })`. Siehe folke/trouble.nvim README → Statusline als Referenz.
+### ~~4. `lualine.setup` falsch konfiguriert~~ ✅ Gefixt
+**Commit:** `🐛 Fix lualine.setup: use direct config instead of lazy.nvim opts pattern`
+**Was wurde gemacht:** lazy.nvim `opts`-Pattern durch direkte lualine-Config ersetzt. Trouble-Symbole werden jetzt korrekt als `lualine_c`-Eintrag registriert.
 
 ---
 
-### 5. `conform.nvim` — `format_on_save` an falscher Stelle
-**Beschreibung:** In `plugin/55-format.lua` ist `format_on_save = { ... }` **innerhalb von `formatters = { luaformat = { ... }, format_on_save = ... }`** verschachtelt. Conform erwartet `format_on_save` auf Top-Level der Setup-Tabelle.
-**Begründung:** Auto-Format beim Speichern funktioniert nicht; conform interpretiert es als (kaputte) Formatter-Definition.
-**Fix-Vorschlag:** `format_on_save` aus `formatters` herausziehen, eine Ebene nach oben in das `setup({...})` Argument.
-**Anleitung für KI-Agent:** In `plugin/55-format.lua`: Entferne `format_on_save = ...` aus dem `formatters`-Tabellen-Body und füge es als geschwisterlichen Schlüssel zu `formatters_by_ft` und `formatters` hinzu. Format: `format_on_save = function(bufnr) return { timeout_ms = 500, lsp_format = "fallback" } end`.
+### ~~5. `conform.nvim` — `format_on_save` an falscher Stelle~~ ✅ Gefixt
+**Commit:** `🐛 Fix conform.nvim: move format_on_save to top-level config`
+**Was wurde gemacht:** `format_on_save` aus dem verschachtelten `formatters`-Block auf die Top-Level-Ebene der `setup()`-Tabelle verschoben.
 
 ---
 
-### 6. `vim.fn.jobstart(vim.cmd(":LspRestart"))` ist Unsinn
-**Beschreibung:** In `lsp/angularls.lua` wird `vim.cmd(":LspRestart")` direkt synchron ausgeführt und gibt `nil` zurück; `jobstart(nil)` ist sinnlos.
-**Begründung:** Doppelte Ausführung / falsche Semantik. `vim.defer_fn` reicht nicht aus, um sicherzustellen, dass `npm install` fertig ist (nutzt blockierendes `vim.fn.system`, also fertig — aber dann ist `jobstart(nil)` trotzdem falsch).
-**Fix-Vorschlag:** Nur `vim.cmd("LspRestart")` ohne `jobstart`. Optional `vim.fn.system` durch async `vim.system()` ersetzen.
-**Anleitung für KI-Agent:** In `lsp/angularls.lua` ersetze `vim.fn.jobstart(vim.cmd(":LspRestart"))` mit `vim.cmd("LspRestart")`. Optional: blockierendes `vim.fn.system` durch `vim.system({...}, { text = true }, on_exit)` async-ifizieren.
+### ~~6. `vim.fn.jobstart(vim.cmd(":LspRestart"))` ist Unsinn~~ ✅ Gefixt
+**Commit:** `🐛 Fix angularls: replace jobstart(vim.cmd()) with vim.cmd('LspRestart')`
+**Was wurde gemacht:** `vim.fn.jobstart(vim.cmd(":LspRestart"))` durch `vim.cmd("LspRestart")` ersetzt.
 
 ---
 
-### 7. Nicht-jdtls LSP-Server werden nie aktiviert
-**Beschreibung:** Die LSP-Configs in `lsp/` (`angularls.lua`, `clangd.lua`, `emmet_language_server.lua`) werden nirgendwo via `vim.lsp.enable(...)` aktiviert. Nur jdtls wird in `plugin/71-jdtls.lua` explizit enabled. `mason-lspconfig.automatic_enable` mit nur `exclude` aktiviert installierte Server — aber zu verifizieren, ob dies wirklich für die in `lsp/` deklarierten Server greift.
-**Begründung:** Verifizieren ob automatic_enable die Server tatsächlich startet — sonst funktionieren die `lsp/*.lua` Files nie.
-**Fix-Vorschlag:** Explizit `vim.lsp.enable({ "clangd", "angularls", "emmet_language_server", "ts_ls", "eslint", "lua_ls" })` in einer zentralen Stelle setzen.
-**Anleitung für KI-Agent:** Prüfe mit dem User per `:LspInfo` welche Server tatsächlich laufen. Falls nicht: Füge in `plugin/50-lsp.lua` nach den Mason-Setups `vim.lsp.enable({...})` mit allen gewünschten Servern hinzu.
+### ~~7. Nicht-jdtls LSP-Server werden nie aktiviert~~ ✅ Gefixt
+**Commit:** `🐛 Explicitly enable LSP servers via vim.lsp.enable()`
+**Was wurde gemacht:** Explizites `vim.lsp.enable({ "lua_ls", "angularls", "ts_ls", "emmet_language_server", "eslint", "clangd" })` in `plugin/50-lsp.lua` ergänzt.
 
 ---
 
 ## 🟡 Mittlere Probleme (Funktionalität eingeschränkt)
 
-### 8. Tote/leere Config-Dateien
-**Beschreibung:** `lua/config/autocmds.lua`, `lua/config/keymaps.lua`, `lua/config/diagnostics.lua` sind leer. `lua/config/init.lua` lädt nur `config.options`. Auch das Top-Level `config/` Verzeichnis ist leer.
-**Begründung:** Verwirrt beim Lesen; suggeriert Funktionalität, die nicht existiert.
-**Fix-Vorschlag:** Entweder befüllen oder löschen. `config/` (top-level) löschen.
-**Anleitung für KI-Agent:** Frage den User, ob die Files gelöscht oder befüllt werden sollen. Wenn löschen: `rm` mit Bestätigung. Wenn behalten: in `lua/config/init.lua` ergänzen: `require("config.autocmds"); require("config.keymaps"); require("config.diagnostics")`.
+### ~~8. Tote/leere Config-Dateien~~ ✅ Gefixt
+**Commit:** `🔥 Remove empty config files (autocmds, keymaps, diagnostics) and empty config/ dir`
+**Was wurde gemacht:** Leere Dateien `lua/config/autocmds.lua`, `lua/config/keymaps.lua`, `lua/config/diagnostics.lua` und das leere Top-Level `config/` Verzeichnis gelöscht.
 
 ---
 
-### 9. `foldmethod = "expr"` ohne `foldexpr`
-**Beschreibung:** `lua/config/options.lua` setzt `vim.wo.foldmethod = "expr"`, aber kein `foldexpr` (z.B. `vim.treesitter.foldexpr()`). Außerdem ist `vim.wo` window-lokal und gilt nur für das aktuelle Fenster beim Start.
-**Begründung:** Folding funktioniert nicht oder unvorhersehbar. `vim.wo` setzt nicht den Default für künftige Fenster.
-**Fix-Vorschlag:** `vim.opt.foldmethod = "expr"` und `vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"`. Neovim 0.12 hat native Treesitter-Parser für C, Lua, Markdown, Vimscript und Vimdoc eingebaut — `foldexpr` funktioniert damit sofort. Für weitere Sprachen liefert `arborist.nvim` (bereits in `plugin/05-arborist.lua`) Parser nach.
-**Anleitung für KI-Agent:** In `lua/config/options.lua` `vim.wo.foldmethod` durch `opt.foldmethod = "expr"` ersetzen und `opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"` ergänzen. Kein zusätzliches Plugin nötig (native Parser + arborist reichen).
+### ~~9. `foldmethod = "expr"` ohne `foldexpr`~~ ✅ Gefixt
+**Commit:** `🐛 Fix folding: use opt.foldmethod + add treesitter foldexpr`
+**Was wurde gemacht:** `vim.wo.foldmethod` durch `opt.foldmethod = "expr"` ersetzt und `opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"` ergänzt. Funktioniert mit nativen 0.12-Parsern + arborist.
 
 ---
 
-### 10. `nvim-lint`: `lint.events` Zuweisung wirkungslos
-**Beschreibung:** `plugin/56-lint.lua` setzt `lint.events = {...}`. Dieses Feld existiert in nvim-lint nicht; die Liste wird aber später korrekt im Autocmd verwendet. Verwirrend, aber harmlos, **außer** dass die Zuweisung `lint.events` als globalen Tabellen-Feld setzt, das nichts steuert.
-**Begründung:** Cosmetic / Maintenance-Falle — sieht aus wie Plugin-Konfig, ist aber nur eine lokale Variable.
-**Fix-Vorschlag:** Lokale Variable nutzen: `local events = { "BufWritePost", ... }`.
-**Anleitung für KI-Agent:** In `plugin/56-lint.lua`: Ersetze `lint.events =` mit `local events =` und passe die `nvim_create_autocmd` Zeile an (`autocmd(events, ...)`).
+### ~~10. `nvim-lint`: `lint.events` Zuweisung wirkungslos~~ ✅ Gefixt
+**Commit:** `♻️ Use local variable for lint events instead of polluting lint table`
+**Was wurde gemacht:** `lint.events = {...}` durch `local events = {...}` ersetzt; Autocmd nutzt jetzt die lokale Variable.
 
 ---
 
-### 11. Doppelte Optionen
-**Beschreibung:** In `lua/config/options.lua` wird `opt.shiftwidth = 4` zweimal gesetzt (einmal früh, einmal weiter unten) und `opt.list = false` zweimal hintereinander.
-**Begründung:** Code-Lärm, keine funktionale Auswirkung.
-**Fix-Vorschlag:** Duplikate entfernen.
-**Anleitung für KI-Agent:** Eine der Zuweisungen jeweils löschen. Behalten: die ausführlichere/kommentierte Version.
+### ~~11. Doppelte Optionen~~ ✅ Gefixt
+**Commit:** `🧹 Remove duplicate options (shiftwidth, list)`
+**Was wurde gemacht:** Doppelte `opt.shiftwidth = 4` und doppelte `opt.list = false` Zuweisungen entfernt.
 
 ---
 
-### 12. JDTLS-Setup ohne projekt-spezifisches `data dir` und `cmd`
+### 12. JDTLS-Setup ohne projekt-spezifisches `data dir` und `cmd` — ⏳ OFFEN
 **Beschreibung:** `plugin/71-jdtls.lua` ruft `vim.lsp.config("jdtls", {...})` und `vim.lsp.enable("jdtls")` global auf. Es fehlen `cmd` (jdtls aus Mason muss explizit angegeben werden), `init_options.workspace`, und vor allem ein **pro-Projekt-`-data` Verzeichnis** (jdtls korrumpiert sonst seinen Workspace-Cache, wenn man zwischen Projekten wechselt).
 **Begründung:** jdtls startet u.U. nicht, oder mehrere Java-Projekte teilen sich denselben Workspace-Cache → Indizierungsfehler.
-**Fix-Vorschlag:** Empfohlene Variante: `nvim-jdtls` `start_or_attach` per FileType-Autocmd nutzen — nicht den generischen lspconfig-Weg. Pro-Projekt `-data` aus Hash des Root-Dirs.
-**Anleitung für KI-Agent:** Lies die nvim-jdtls README. Ersetze in `plugin/71-jdtls.lua` `vim.lsp.config/enable` durch einen `FileType java` Autocmd, der `require('jdtls').start_or_attach({ cmd = {...}, root_dir = ..., data = vim.fn.stdpath('cache') .. '/jdtls/' .. project_name, ...})` ausführt. Frage den User vorher, ob er den lspconfig- oder den nvim-jdtls-Weg bevorzugt.
+
+**Warum nicht gefixt:**
+Dieser Fix erfordert eine grundsätzliche Architekturentscheidung, die nicht automatisch getroffen werden kann:
+
+1. **Zwei mögliche Wege:** Entweder den generischen `vim.lsp.config()` + `vim.lsp.enable()` Weg beibehalten (einfacher, aber weniger jdtls-Features) oder auf den empfohlenen `nvim-jdtls`-Weg mit `require('jdtls').start_or_attach()` per `FileType java` Autocmd umsteigen (voller Feature-Umfang inkl. Code Actions, Test-Runner, etc.).
+2. **Mason-Pfad-Abhängigkeit:** Das `cmd`-Array muss den exakten Pfad zur jdtls-Binary aus Mason enthalten (`vim.fn.expand("$MASON/bin/jdtls")`), und ggf. plattformspezifische Launcher-Argumente.
+3. **Projekt-Workspace-Isolation:** Das `-data`-Verzeichnis muss pro Projekt eindeutig sein (z.B. `vim.fn.stdpath('cache') .. '/jdtls/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')`), sonst korrumpieren sich Projekte gegenseitig.
+4. **Bestehendes `on_attach`:** In `plugin/71-jdtls.lua` ist bereits ein `on_attach` mit DAP-Setup und Test-Keymaps konfiguriert, das beim Umstieg sorgfältig migriert werden muss.
+
+**📋 TODO für dich:**
+- Entscheide: `vim.lsp.config`-Weg beibehalten oder auf `require('jdtls').start_or_attach()` umsteigen?
+- Falls `start_or_attach`: Das gesamte `plugin/71-jdtls.lua` muss umgeschrieben werden (FileType-Autocmd, cmd-Array, pro-Projekt data-dir, root_dir-Erkennung).
+- Falls `vim.lsp.config` beibehalten: Mindestens `cmd` und ein dynamisches `-data`-Verzeichnis ergänzen. Prüfe, ob Mason-jdtls das `cmd` automatisch setzt.
+- Teste danach mit mindestens 2 verschiedenen Java-Projekten, ob die Workspace-Caches sauber getrennt sind.
 
 ---
 
-### 13. DAP-Module unter `lua/dap/` (siehe Repo-Memo)
-**Beschreibung:** `lua/dap/jdtls.lua`, `lua/dap/clang.lua`, etc. liegen im Modul-Pfad `dap.*`. Laut Repo-Memo `nvim-dap-module-collisions.md` kollidiert das mit nvim-dap internen Modulen. Die aktuellen Namen (`dap.jdtls`, `dap.clang`, `dap.debugpy`) kollidieren zwar nicht mit echten internen Modulen — aber das Risiko bleibt bestehen.
-**Begründung:** Vorbeugung; bereits einmal gebrannt mit `dap.ui`.
-**Fix-Vorschlag:** Module nach `lua/config/dap/` (oder `lua/myconfig/dap/`) verschieben.
-**Anleitung für KI-Agent:** Verschiebe alle Files aus `lua/dap/` nach `lua/config/dap/`. Passe alle `require("dap.xxx")` in `plugin/70-dap.lua` auf `require("config.dap.xxx")` an. Aktualisiere danach das Repo-Memo.
+### ~~13. DAP-Module unter `lua/dap/`~~ ✅ Gefixt
+**Commit:** `🚚 Move DAP modules from lua/dap/ to lua/config/dap/ to avoid nvim-dap collisions` (via Branch `fix/move-dap-modules`)
+**Was wurde gemacht:** Alle DAP-Module von `lua/dap/` nach `lua/config/dap/` verschoben. Alle `require("dap.xxx")` in `plugin/70-dap.lua` auf `require("config.dap.xxx")` angepasst.
 
 ---
 
@@ -100,76 +94,69 @@ Stand: 28. April 2026. Sortiert nach Schweregrad. Verifiziert für Neovim 0.12.x
 
 ---
 
-### 15. `selection = "exclusive"` kann unerwartet stören
+### 15. `selection = "exclusive"` kann unerwartet stören — ⏳ OFFEN
 **Beschreibung:** `lua/config/options.lua` setzt `opt.selection = "exclusive"`. Das ändert das Verhalten von `v`-Visual-Select und vielen Operatoren — z.B. `viw` schließt das letzte Zeichen nicht ein.
 **Begründung:** Default `inclusive` ist robuster für Text-Operationen.
-**Fix-Vorschlag:** Auf Default lassen (entfernen) oder bewusst dokumentieren.
-**Anleitung für KI-Agent:** Frage den User, ob das beabsichtigt ist. Wenn nicht: Zeile löschen.
+
+**Warum nicht gefixt:**
+Dies ist eine persönliche Präferenz, kein klarer Bug:
+
+1. **`exclusive` ist ein valider Wert** — Neovim unterstützt ihn bewusst. Manche User bevorzugen ihn, weil er sich näher am Verhalten anderer Editoren (VS Code, Sublime) anfühlt, wo Selektionen das letzte Zeichen nicht einschließen.
+2. **Entfernen könnte Muscle Memory brechen:** Falls du seit längerem mit `exclusive` arbeitest, hast du dich möglicherweise daran gewöhnt. Das Entfernen ändert das Verhalten von `v`, `V`, `<C-v>`, `viw`, `vaw`, `vi"`, `va(` und sämtlichen Visual-Mode-Operationen.
+3. **Auswirkung auf Plugins:** `mini.surround`, `mini.comment` und andere Text-Objekt-Plugins verhalten sich je nach `selection`-Wert unterschiedlich. Ein Wechsel erfordert Testen all dieser Workflows.
+
+**📋 TODO für dich:**
+- Teste bewusst: Öffne eine Datei, mache `viw` auf einem Wort und prüfe, ob das letzte Zeichen mit-selektiert wird. Ist das das Verhalten, das du willst?
+- Falls du `exclusive` behalten willst: Kein Fix nötig — dokumentiere es als bewusste Entscheidung (z.B. Kommentar in `options.lua`).
+- Falls du es nicht bewusst gesetzt hast: Entferne die Zeile `opt.selection = "exclusive"` aus `lua/config/options.lua` und teste deine üblichen Visual-Mode-Workflows.
 
 ---
 
 ## 🟢 Kleinere Probleme / Stilfragen
 
-### 16. `vim.g.autoformat = true` und `vim.g.trouble_lualine = true`
-**Beschreibung:** `lua/config/options.lua` setzt zwei LazyVim-spezifische Globale. Die Config nutzt aber kein LazyVim → wirkungslos.
-**Fix-Vorschlag:** Entfernen.
-**Anleitung für KI-Agent:** Beide Zeilen aus `lua/config/options.lua` löschen.
+### ~~16. `vim.g.autoformat = true` und `vim.g.trouble_lualine = true`~~ ✅ Gefixt
+**Commit:** `🔥 Remove unused LazyVim globals (vim.g.autoformat, vim.g.trouble_lualine)`
+**Was wurde gemacht:** Beide wirkungslosen LazyVim-Globale aus `lua/config/options.lua` entfernt.
 
 ---
 
-### 17. `undodir = ~/.vim/undodir`
-**Beschreibung:** Vim-Pfad statt Neovim-stdpath. Funktioniert, aber unsauber.
-**Fix-Vorschlag:** `vim.fn.stdpath("state") .. "/undo"`.
-**Anleitung für KI-Agent:** In `lua/config/options.lua` `~/.vim/undodir` durch `vim.fn.stdpath("state") .. "/undo"` ersetzen, an beiden Stellen (Zuweisung + mkdir).
+### ~~17. `undodir = ~/.vim/undodir`~~ ✅ Gefixt
+**Commit:** `♻️ Use vim.fn.stdpath('state')/undo instead of ~/.vim/undodir`
+**Was wurde gemacht:** Beide Stellen (Option + mkdir-Block) auf `vim.fn.stdpath("state") .. "/undo"` umgestellt.
 
 ---
 
-### 20. `mini.snippets` ohne Snippet-Loader
-**Beschreibung:** `plugin/02-mini.lua` ruft `require("mini.snippets").setup({})` auf, lädt aber keine Snippets (z.B. via `gen_loader.from_lang()`).
-**Fix-Vorschlag:** Loader konfigurieren oder Setup entfernen.
-**Anleitung für KI-Agent:** Wenn Snippets gewünscht: `local gen_loader = require("mini.snippets").gen_loader; require("mini.snippets").setup({ snippets = { gen_loader.from_file(...), gen_loader.from_lang() } })`. Sonst Zeile entfernen.
-
-=> nutze from_lang()
-=> nutze auch dieses Plugin für snippets: https://github.com/rafamadriz/friendly-snippets
+### ~~20. `mini.snippets` ohne Snippet-Loader~~ ✅ Gefixt
+**Commit:** `✨ Configure mini.snippets with gen_loader.from_lang() + friendly-snippets`
+**Was wurde gemacht:** `friendly-snippets` Plugin hinzugefügt und `mini.snippets` mit `gen_loader.from_lang()` Loader konfiguriert.
 
 ---
 
-### 21. `dap.providers.configs.jdtls = nil` redundant gesetzt
-**Beschreibung:** Sowohl in `lua/dap/jdtls.lua` als auch in `plugin/71-jdtls.lua` wird die jdtls-DAP-Discovery deaktiviert.
-**Fix-Vorschlag:** Auf eine Stelle reduzieren.
-**Anleitung für KI-Agent:** In `lua/dap/jdtls.lua` die Funktion `disable_jdtls_discovery_provider()` und ihre Aufrufe entfernen, da `plugin/71-jdtls.lua` das beim `on_attach` schon erledigt.
+### ~~21. `dap.providers.configs.jdtls = nil` redundant gesetzt~~ ✅ Gefixt
+### ~~22. `M.ensure_adapter()` / `M.ensure_configs()` am Ende von `dap/jdtls.lua`~~ ✅ Gefixt
+**Commit:** `🧹 Clean up DAP jdtls: remove redundant discovery disable + startup-time calls`
+**Was wurde gemacht:** `disable_jdtls_discovery_provider()` Funktion und alle Aufrufe aus `lua/config/dap/jdtls.lua` entfernt (wird bereits in `plugin/71-jdtls.lua` on_attach erledigt). Die wirkungslosen Startup-Aufrufe `M.ensure_adapter()` / `M.ensure_configs()` am Modulende entfernt.
 
 ---
 
-### 22. `M.ensure_adapter()` / `M.ensure_configs()` am Ende von `dap/jdtls.lua` werden zur Startzeit ausgeführt
-**Beschreibung:** `lua/dap/jdtls.lua` ruft `ensure_adapter`/`ensure_configs` direkt beim `require`. Da dies in `plugin/70-dap.lua` am Startup passiert, läuft es bevor jdtls je gestartet wurde — also wirkungslos. Außerdem: doppelte Logik mit dem `dap_continue` Wrapper.
-**Fix-Vorschlag:** Direkten Aufruf am Modulende entfernen; nur durch `dap_continue` triggern.
-**Anleitung für KI-Agent:** In `lua/dap/jdtls.lua` die letzten zwei Zeilen `M.ensure_adapter()` und `M.ensure_configs()` (vor `return M`) löschen.
+### ~~23. `opt.path:append("**")`~~ ✅ Gefixt
+**Commit:** `🔥 Remove opt.path:append('**') — using mini.pick for file finding`
+**Was wurde gemacht:** Zeile entfernt.
 
 ---
 
-### 23. `opt.path:append("**")`
-**Beschreibung:** Macht `:find` rekursiv aber kann in großen Repos langsam werden.
-**Fix-Vorschlag:** Da `mini.pick` und Telescope-artige Tools genutzt werden, `**` nicht nötig.
-**Anleitung für KI-Agent:** Zeile in `lua/config/options.lua` entfernen, wenn der User `mini.pick` für File-Finding nutzt.
+### ~~24. `ttimeoutlen = 0`~~ ✅ Gefixt
+**Commit:** `🐛 Set ttimeoutlen=10 instead of 0 to avoid broken escape sequences`
+**Was wurde gemacht:** `opt.ttimeoutlen = 0` auf `opt.ttimeoutlen = 10` gesetzt.
 
 ---
 
-### 24. `ttimeoutlen = 0`
-**Beschreibung:** Kann auf manchen Terminals (insbesondere SSH/tmux) Escape-Sequenzen brechen — z.B. Funktionstasten oder Maus-Codes können fehlschlagen.
-**Fix-Vorschlag:** Default (`50`) lassen oder explizit `10` setzen.
-**Anleitung für KI-Agent:** In `lua/config/options.lua` `opt.ttimeoutlen = 0` entfernen oder auf `10` setzen.
+### ~~25. `which-key` Eintrag in `00-whichkey.lua` falsch geschachtelt~~ ✅ Gefixt
+**Commit:** `🐛 Fix which-key spec: use flat desc key instead of nested table`
+**Was wurde gemacht:** `{ desc = "..." }` (verschachtelte Tabelle) zu `desc = "..."` (flacher Key) korrigiert.
 
 ---
 
-### 25. `which-key` Eintrag in `00-whichkey.lua` falsch geschachtelt
-**Beschreibung:** In `plugin/00-whichkey.lua` ist `{ desc = "..." }` als drittes Element der Spec-Tabelle übergeben. Korrekte Syntax: `desc` direkt als Key, nicht in einer extra Tabelle.
-**Fix-Vorschlag:** `{ desc = "..." }` zu `desc = "..."` umschreiben.
-**Anleitung für KI-Agent:** In `plugin/00-whichkey.lua` ersetze `{ desc = "Buffer Local Keymaps (which-key)" }` durch `desc = "Buffer Local Keymaps (which-key)"` direkt im umgebenden Spec.
-
----
-
-### 26. Kein `<leader>`-Key explizit gesetzt
-**Beschreibung:** Es wird auf Space-Leader gesetzt (`mini.basics` setzt das), aber nicht explizit. Falls `mini.basics` mal entfernt wird, fallen alle `<leader>...` Keymaps auf `\` zurück.
-**Fix-Vorschlag:** `vim.g.mapleader = " "` und `vim.g.maplocalleader = " "` früh in `lua/config/options.lua` (oder vor `init.lua`-Plugin-Lade) setzen.
-**Anleitung für KI-Agent:** Am Anfang von `lua/config/options.lua` zwei Zeilen ergänzen: `vim.g.mapleader = " "` und `vim.g.maplocalleader = " "`.
+### ~~26. Kein `<leader>`-Key explizit gesetzt~~ ✅ Gefixt
+**Commit:** `🔧 Explicitly set mapleader and maplocalleader to space`
+**Was wurde gemacht:** `vim.g.mapleader = " "` und `vim.g.maplocalleader = " "` am Anfang von `lua/config/options.lua` ergänzt.
