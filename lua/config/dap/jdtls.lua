@@ -2,12 +2,6 @@
 local dap = require("dap")
 local M = {}
 
-local function disable_jdtls_discovery_provider()
-    if dap.providers and dap.providers.configs then
-        dap.providers.configs.jdtls = nil
-    end
-end
-
 local function has_config(configs, name)
     for _, config in ipairs(configs) do
         if config.name == name then
@@ -42,7 +36,6 @@ end
 
 function M.ensure_adapter()
     if dap.adapters.java then
-        disable_jdtls_discovery_provider()
         return true
     end
 
@@ -58,10 +51,6 @@ function M.ensure_adapter()
     if not setup_ok then
         return false
     end
-
-    -- Disable jdtls auto discovery provider; it depends on commands that are
-    -- not consistently available in all workspaces and causes slow/failed picks.
-    disable_jdtls_discovery_provider()
 
     return dap.adapters.java ~= nil
 end
@@ -115,8 +104,5 @@ function M.ensure_configs()
         })
     end
 end
-
-M.ensure_adapter()
-M.ensure_configs()
 
 return M
