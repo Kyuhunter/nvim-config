@@ -63,24 +63,14 @@ Stand: 28. April 2026. Sortiert nach Schweregrad. Verifiziert für Neovim 0.12.x
 
 ---
 
-### 12. JDTLS-Setup ohne projekt-spezifisches `data dir` und `cmd` — ⏳ OFFEN
-**Beschreibung:** `plugin/71-jdtls.lua` ruft `vim.lsp.config("jdtls", {...})` und `vim.lsp.enable("jdtls")` global auf. Es fehlen `cmd` (jdtls aus Mason muss explizit angegeben werden), `init_options.workspace`, und vor allem ein **pro-Projekt-`-data` Verzeichnis** (jdtls korrumpiert sonst seinen Workspace-Cache, wenn man zwischen Projekten wechselt).
-**Begründung:** jdtls startet u.U. nicht, oder mehrere Java-Projekte teilen sich denselben Workspace-Cache → Indizierungsfehler.
-
-**Warum nicht gefixt:**
-Dieser Fix erfordert eine grundsätzliche Architekturentscheidung, die nicht automatisch getroffen werden kann:
-
-1. **Zwei mögliche Wege:** Entweder den generischen `vim.lsp.config()` + `vim.lsp.enable()` Weg beibehalten (einfacher, aber weniger jdtls-Features) oder auf den empfohlenen `nvim-jdtls`-Weg mit `require('jdtls').start_or_attach()` per `FileType java` Autocmd umsteigen (voller Feature-Umfang inkl. Code Actions, Test-Runner, etc.).
-2. **Mason-Pfad-Abhängigkeit:** Das `cmd`-Array muss den exakten Pfad zur jdtls-Binary aus Mason enthalten (`vim.fn.expand("$MASON/bin/jdtls")`), und ggf. plattformspezifische Launcher-Argumente.
-3. **Projekt-Workspace-Isolation:** Das `-data`-Verzeichnis muss pro Projekt eindeutig sein (z.B. `vim.fn.stdpath('cache') .. '/jdtls/' .. vim.fn.fnamemodify(root_dir, ':p:h:t')`), sonst korrumpieren sich Projekte gegenseitig.
-4. **Bestehendes `on_attach`:** In `plugin/71-jdtls.lua` ist bereits ein `on_attach` mit DAP-Setup und Test-Keymaps konfiguriert, das beim Umstieg sorgfältig migriert werden muss.
-
-**📋 TODO für dich:**
-- Entscheide: `vim.lsp.config`-Weg beibehalten oder auf `require('jdtls').start_or_attach()` umsteigen?
-- Falls `start_or_attach`: Das gesamte `plugin/71-jdtls.lua` muss umgeschrieben werden (FileType-Autocmd, cmd-Array, pro-Projekt data-dir, root_dir-Erkennung).
-- Falls `vim.lsp.config` beibehalten: Mindestens `cmd` und ein dynamisches `-data`-Verzeichnis ergänzen. Prüfe, ob Mason-jdtls das `cmd` automatisch setzt.
-- Teste danach mit mindestens 2 verschiedenen Java-Projekten, ob die Workspace-Caches sauber getrennt sind.
-
+### ~~12. JDTLS-Setup ohne projekt-spezifisches `data dir` und `cmd`~~ ✅ Gefixt
+**Commit:** `♻️ Migrate jdtls to nvim-jdtls start_or_attach with per-project data dir` (via Branch `fix/jdtls-per-project`)
+**Was wurde gemacht:**
+- `vim.lsp.config()` + `vim.lsp.enable()` durch `FileType java` Autocmd mit `require('jdtls').start_or_attach()` ersetzt.
+- Pro-Projekt Workspace-Verzeichnis: `vim.fn.stdpath("cache") .. "/jdtls/" .. <project_name>` (Projektname aus root_dir-Basename).
+- Explizites `cmd = { vim.fn.expand("$MASON/bin/jdtls"), "-data", workspace_dir }`.
+- `root_dir` via `vim.fs.root(0, root_markers)` ermittelt.
+- Bestehende `on_attach`-Logik (DAP-Setup, Test-Keymaps) übernommen.
 ---
 
 ### ~~13. DAP-Module unter `lua/dap/`~~ ✅ Gefixt
@@ -94,22 +84,9 @@ Dieser Fix erfordert eine grundsätzliche Architekturentscheidung, die nicht aut
 
 ---
 
-### 15. `selection = "exclusive"` kann unerwartet stören — ⏳ OFFEN
-**Beschreibung:** `lua/config/options.lua` setzt `opt.selection = "exclusive"`. Das ändert das Verhalten von `v`-Visual-Select und vielen Operatoren — z.B. `viw` schließt das letzte Zeichen nicht ein.
-**Begründung:** Default `inclusive` ist robuster für Text-Operationen.
-
-**Warum nicht gefixt:**
-Dies ist eine persönliche Präferenz, kein klarer Bug:
-
-1. **`exclusive` ist ein valider Wert** — Neovim unterstützt ihn bewusst. Manche User bevorzugen ihn, weil er sich näher am Verhalten anderer Editoren (VS Code, Sublime) anfühlt, wo Selektionen das letzte Zeichen nicht einschließen.
-2. **Entfernen könnte Muscle Memory brechen:** Falls du seit längerem mit `exclusive` arbeitest, hast du dich möglicherweise daran gewöhnt. Das Entfernen ändert das Verhalten von `v`, `V`, `<C-v>`, `viw`, `vaw`, `vi"`, `va(` und sämtlichen Visual-Mode-Operationen.
-3. **Auswirkung auf Plugins:** `mini.surround`, `mini.comment` und andere Text-Objekt-Plugins verhalten sich je nach `selection`-Wert unterschiedlich. Ein Wechsel erfordert Testen all dieser Workflows.
-
-**📋 TODO für dich:**
-- Teste bewusst: Öffne eine Datei, mache `viw` auf einem Wort und prüfe, ob das letzte Zeichen mit-selektiert wird. Ist das das Verhalten, das du willst?
-- Falls du `exclusive` behalten willst: Kein Fix nötig — dokumentiere es als bewusste Entscheidung (z.B. Kommentar in `options.lua`).
-- Falls du es nicht bewusst gesetzt hast: Entferne die Zeile `opt.selection = "exclusive"` aus `lua/config/options.lua` und teste deine üblichen Visual-Mode-Workflows.
-
+### ~~15. `selection = "exclusive"` kann unerwartet stören~~ ✅ Gefixt
+**Commit:** `🔥 Remove opt.selection='exclusive' to use Vim default 'inclusive'` (`d98969c`)
+**Was wurde gemacht:** Zeile `opt.selection = "exclusive"` aus `lua/config/options.lua` entfernt → Vim-Default `inclusive` ist wieder aktiv.
 ---
 
 ## 🟢 Kleinere Probleme / Stilfragen
