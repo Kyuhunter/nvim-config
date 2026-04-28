@@ -41,20 +41,23 @@ local function has_java_test()
     ) > 0
 end
 
+-- Priorisierte Marker: erst Build-Marker (gewinnt das *nächste* Sub-Projekt),
+-- dann erst `.git` als Fallback. Sonst „schluckt" ein großes Git-Repo
+-- alle Sub-Projekte, weil der Repo-Root als root_dir gewählt wird.
 local root_markers = {
-    "mvnw",
-    "gradlew",
-    "pom.xml",
-    "settings.gradle",
-    "settings.gradle.kts",
-    "build.gradle",
-    "build.gradle.kts",
-    ".git",
+    { "mvnw", "gradlew" },
+    { "pom.xml", "build.gradle", "build.gradle.kts",
+      "settings.gradle", "settings.gradle.kts" },
+    { ".git" },
 }
 
 local function start_jdtls()
     local jdtls = require("jdtls")
-    local root_dir = vim.fs.root(0, root_markers)
+    local root_dir
+    for _, group in ipairs(root_markers) do
+        root_dir = vim.fs.root(0, group)
+        if root_dir then break end
+    end
     if not root_dir then return end
 
     -- Per-project workspace data directory to avoid cross-project cache corruption.
@@ -72,6 +75,22 @@ local function start_jdtls()
             java = {
                 inlayHints = {
                     parameterNames = { enabled = "all" },
+                },
+                -- Nur das aktuelle Sub-Projekt importieren, nicht
+                -- Geschwister-Module eines übergeordneten Aggregator-POMs.
+                -- Default-Exclusions + alles, was *nicht* das aktuelle root_dir ist,
+                -- wird ohnehin nicht aktiv geladen — diese Liste verhindert,
+                -- dass JDTLS in tief verschachtelten Repos beim Crawl andere
+                -- Build-Verzeichnisse für eigenständige Projekte hält.
+                import = {
+                    exclusions = {
+                        "**/node_modules/**",
+                        "**/.metadata/**",
+                        "**/archetype-resources/**",
+                        "**/META-INF/maven/**",
+                        "**/target/**",
+                        "**/build/**",
+                    },
                 },
             },
         },
