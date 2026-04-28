@@ -51,13 +51,37 @@ local root_markers = {
     { ".git" },
 }
 
+--- Findet das Projekt-Root für JDTLS.
+--- Bevorzugt das *tiefste* Verzeichnis oberhalb der Datei, das ein
+--- `src/main/java` oder `src/test/java` enthält — so gewinnen Sub-Projekte
+--- immer gegen einen Aggregator-`pom.xml` oder ein `.git` am Repo-Root.
+--- Fallback: priorisierte `root_markers`.
+local function find_project_root(bufnr)
+    local path = vim.api.nvim_buf_get_name(bufnr)
+    if path == "" then path = vim.uv.cwd() end
+
+    -- 1. Tiefstes Verzeichnis mit src/main/java oder src/test/java.
+    --    `vim.fs.parents` liefert von tief nach flach → erstes Match gewinnt.
+    for dir in vim.fs.parents(path) do
+        for _, sub in ipairs({ "src/main/java", "src/test/java" }) do
+            local stat = vim.uv.fs_stat(dir .. "/" .. sub)
+            if stat and stat.type == "directory" then
+                return dir
+            end
+        end
+    end
+
+    -- 2. Fallback: priorisierte Marker.
+    for _, group in ipairs(root_markers) do
+        local r = vim.fs.root(bufnr, group)
+        if r then return r end
+    end
+    return nil
+end
+
 local function start_jdtls()
     local jdtls = require("jdtls")
-    local root_dir
-    for _, group in ipairs(root_markers) do
-        root_dir = vim.fs.root(0, group)
-        if root_dir then break end
-    end
+    local root_dir = find_project_root(0)
     if not root_dir then return end
 
     -- Per-project workspace data directory to avoid cross-project cache corruption.
