@@ -1,6 +1,9 @@
 local opt = vim.opt
 local o = vim.o
 
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
 opt.number = true -- Line numbers
 opt.relativenumber = true -- Relative line numbers
 opt.cursorline = true -- Highlight current line
