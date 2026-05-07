@@ -40,6 +40,18 @@ require("mini.surround").setup({})
 require("mini.comment").setup({})
 require("mini.completion").setup({
     window = { info = { border = "single" }, signature = { border = "single" } },
+    fallback_action = function()
+        local path_keys = vim.api.nvim_replace_termcodes("<C-x><C-f>", true, false, true)
+        vim.api.nvim_feedkeys(path_keys, "n", false)
+
+        -- Keep previous behavior when path completion has no candidates.
+        vim.schedule(function()
+            if vim.fn.mode() == "i" and vim.fn.pumvisible() == 0 then
+                local word_keys = vim.api.nvim_replace_termcodes("<C-n>", true, false, true)
+                vim.api.nvim_feedkeys(word_keys, "n", false)
+            end
+        end)
+    end,
 })
 require("mini.pick").setup({})
 wk.add({
