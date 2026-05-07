@@ -9,6 +9,29 @@ local gen_loader = require("mini.snippets").gen_loader
 require("mini.snippets").setup({
     snippets = { gen_loader.from_lang() },
 })
+
+-- Sessions sauber beenden, wenn der Insert-Mode verlassen wird.
+-- Sonst bleiben die Tabstop-Marker („Rechtecke") sichtbar und lassen
+-- sich nicht mit normalen Edit-Befehlen entfernen.
+vim.api.nvim_create_autocmd("ModeChanged", {
+    group = vim.api.nvim_create_augroup("mini-snippets-stop", { clear = true }),
+    pattern = { "i:n", "s:n" },
+    callback = function()
+        local ok, mini_snippets = pcall(require, "mini.snippets")
+        if ok and mini_snippets.session and mini_snippets.session.get() then
+            pcall(mini_snippets.session.stop)
+        end
+    end,
+})
+
+-- Normal-Mode-Notbremse: <Esc><Esc> beendet eine hängengebliebene Session.
+vim.keymap.set("n", "<Esc><Esc>", function()
+    local ok, mini_snippets = pcall(require, "mini.snippets")
+    if ok and mini_snippets.session and mini_snippets.session.get() then
+        pcall(mini_snippets.session.stop)
+    end
+end, { desc = "Stop mini.snippets session" })
+
 require("mini.icons").setup({})
 require("mini.pairs").setup({})
 require("mini.basics").setup({})
