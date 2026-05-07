@@ -122,6 +122,13 @@ local function start_jdtls()
             bundles = get_bundles(),
         },
         on_attach = function(client, bufnr)
+            -- jdtls registriert `inlayHintProvider` dynamisch *nach* dem Attach,
+            -- daher hier bedingungslos aktivieren. Neovim rendert nur, wenn der
+            -- Server tatsächlich Hints liefert.
+            if vim.lsp.inlay_hint and vim.lsp.inlay_hint.enable then
+                vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+            end
+
             if has_java_debug() and not client._jdtls_dap_setup then
                 client._jdtls_dap_setup = true
                 jdtls.setup_dap({
