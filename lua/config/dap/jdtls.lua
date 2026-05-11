@@ -202,31 +202,10 @@ local function resolve_launch_mainclass()
 end
 
 local function resolve_custom_launch_mainclass(root)
-    local stored = read_stored_mainclasses(root)
-
-    local items = { "Custom class für dieses Projekt:" }
-    local custom_index = 2
-    if #stored > 0 then
-        for index, class_name in ipairs(stored) do
-            table.insert(items, string.format("%d. %s", index + 1, class_name))
-        end
-        custom_index = #stored + 2
-    end
-
-    table.insert(items, string.format("%d. Neue Klasse eingeben", custom_index))
-    table.insert(items, string.format("%d. Abbrechen", custom_index + 1))
-
-    local choice = vim.fn.inputlist(items)
-    if choice >= 2 and choice <= (#stored + 1) then
-        return stored[choice - 1]
-    end
-
-    if choice == custom_index then
-        local input = trim(vim.fn.input("Main class (e.g. com.example.Main): "))
-        if input ~= "" then
-            save_stored_mainclass(root, input)
-            return input
-        end
+    local input = trim(vim.fn.input("Custom class name: "))
+    if input ~= "" then
+        save_stored_mainclass(root, input)
+        return input
     end
 
     return nil
@@ -238,7 +217,7 @@ local function build_java_launch_configs(root)
     table.insert(configs, mark_owned_java_launch({
         type = "java",
         request = "launch",
-        name = "Main / App",
+        name = "Launch Java main class",
         cwd = "${workspaceFolder}",
         console = "integratedTerminal",
         mainClass = function()
@@ -255,7 +234,7 @@ local function build_java_launch_configs(root)
     table.insert(configs, mark_owned_java_launch({
         type = "java",
         request = "launch",
-        name = "Nearest",
+        name = "Launch nearest class",
         cwd = "${workspaceFolder}",
         console = "integratedTerminal",
         mainClass = function()
@@ -296,7 +275,7 @@ local function build_java_launch_configs(root)
     table.insert(configs, mark_owned_java_launch({
         type = "java",
         request = "attach",
-        name = "Attach to remote",
+        name = "Attach to remote JVM (:5005)",
         hostName = "127.0.0.1",
         port = function()
             local port = tonumber(vim.fn.input("JVM debug port: ", "5005"))
