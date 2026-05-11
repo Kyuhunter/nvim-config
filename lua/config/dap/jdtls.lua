@@ -42,6 +42,15 @@ local function trim(value)
     return vim.trim(value or "")
 end
 
+local function is_owned_java_launch(config)
+    return config and config.__jdtls_java_launch == true
+end
+
+local function mark_owned_java_launch(config)
+    config.__jdtls_java_launch = true
+    return config
+end
+
 local root_markers = {
     { "mvnw", "gradlew" },
     { "pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts" },
@@ -173,35 +182,43 @@ local function save_stored_mainclass(root, class_name)
     file:close()
 end
 
-local function prompt_mainclass_from_menu(root)
-    local stored = read_stored_mainclasses(root)
+local function resolve_launch_mainclass()
+    local preferred_main = find_preferred_mainclass()
+    if preferred_main and preferred_main ~= "" then
+        return preferred_main
+    end
 
-    if #stored == 0 then
-        local input = trim(vim.fn.input("Main class (e.g. com.example.Main): "))
-        if input ~= "" then
-            save_stored_mainclass(root, input)
-            return input
-        end
-
+    local root = find_project_root()
+    if not root or root == "" then
         return nil
     end
 
-    local items = {
-        "Keine Main/App.java gefunden. Wähle eine Klasse:",
-    }
-
-    for index, class_name in ipairs(stored) do
-        table.insert(items, string.format("%d. %s", index, class_name))
+    local input = trim(vim.fn.input("Main class (e.g. com.example.Main): "))
+    if input ~= "" then
+        return input
     end
 
-    local custom_index = #stored + 1
-    local cancel_index = #stored + 2
-    table.insert(items, string.format("%d. Eigene Klasse eingeben", custom_index))
-    table.insert(items, string.format("%d. Abbrechen", cancel_index))
+    return nil
+end
+
+local function resolve_custom_launch_mainclass(root)
+    local stored = read_stored_mainclasses(root)
+
+    local items = { "Custom class für dieses Projekt:" }
+    local custom_index = 2
+    if #stored > 0 then
+        for index, class_name in ipairs(stored) do
+            table.insert(items, string.format("%d. %s", index + 1, class_name))
+        end
+        custom_index = #stored + 2
+    end
+
+    table.insert(items, string.format("%d. Neue Klasse eingeben", custom_index))
+    table.insert(items, string.format("%d. Abbrechen", custom_index + 1))
 
     local choice = vim.fn.inputlist(items)
-    if choice >= 1 and choice <= #stored then
-        return stored[choice]
+    if choice >= 2 and choice <= (#stored + 1) then
+        return stored[choice - 1]
     end
 
     if choice == custom_index then
@@ -215,18 +232,79 @@ local function prompt_mainclass_from_menu(root)
     return nil
 end
 
-local function resolve_launch_mainclass()
-    local preferred_main = find_preferred_mainclass()
-    if preferred_main and preferred_main ~= "" then
-        return preferred_main
+local function build_java_launch_configs(root)
+    local configs = {}
+
+    table.insert(configs, mark_owned_java_launch({
+        type = "java",
+        request = "launch",
+        name = "Main / App",
+        cwd = "${workspaceFolder}",
+        console = "integratedTerminal",
+        mainClass = function()
+            local preferred_main = find_preferred_mainclass()
+            if preferred_main and preferred_main ~= "" then
+                return preferred_main
+            end
+
+            return resolve_launch_mainclass()
+        end,
+        projectName = "",
+    }))
+
+    table.insert(configs, mark_owned_java_launch({
+        type = "java",
+        request = "launch",
+        name = "Nearest",
+        cwd = "${workspaceFolder}",
+        console = "integratedTerminal",
+        mainClass = function()
+            local class_name = resolve_current_classname()
+            if class_name and class_name ~= "" then
+                return class_name
+            end
+
+            return resolve_launch_mainclass()
+        end,
+        projectName = "",
+    }))
+
+    table.insert(configs, mark_owned_java_launch({
+        type = "java",
+        request = "launch",
+        name = "Custom",
+        cwd = "${workspaceFolder}",
+        console = "integratedTerminal",
+        mainClass = function()
+            return resolve_custom_launch_mainclass(root)
+        end,
+        projectName = "",
+    }))
+
+    for _, class_name in ipairs(read_stored_mainclasses(root)) do
+        table.insert(configs, mark_owned_java_launch({
+            type = "java",
+            request = "launch",
+            name = "Custom: " .. class_name,
+            cwd = "${workspaceFolder}",
+            console = "integratedTerminal",
+            mainClass = class_name,
+            projectName = "",
+        }))
     end
 
-    local root = find_project_root()
-    if not root or root == "" then
-        return nil
-    end
+    table.insert(configs, mark_owned_java_launch({
+        type = "java",
+        request = "attach",
+        name = "Attach to remote",
+        hostName = "127.0.0.1",
+        port = function()
+            local port = tonumber(vim.fn.input("JVM debug port: ", "5005"))
+            return port or 5005
+        end,
+    }))
 
-    return prompt_mainclass_from_menu(root)
+    return configs
 end
 
 function M.ensure_adapter()
@@ -251,53 +329,25 @@ function M.ensure_adapter()
 end
 
 function M.ensure_configs()
-    dap.configurations.java = dap.configurations.java or {}
-
-    if not has_config(dap.configurations.java, "Launch Java main class") then
-        table.insert(dap.configurations.java, {
-            type = "java",
-            request = "launch",
-            name = "Launch Java main class",
-            cwd = "${workspaceFolder}",
-            console = "integratedTerminal",
-            mainClass = function()
-                return resolve_launch_mainclass()
-            end,
-            projectName = "",
-        })
+    local root = find_project_root()
+    if not root or root == "" then
+        return
     end
 
-    if not has_config(dap.configurations.java, "Launch nearest class") then
-        table.insert(dap.configurations.java, {
-            type = "java",
-            request = "launch",
-            name = "Launch nearest class",
-            cwd = "${workspaceFolder}",
-            console = "integratedTerminal",
-            mainClass = function()
-                local class_name = resolve_current_classname()
-                if class_name and class_name ~= "" then
-                    return class_name
-                end
-
-                return vim.fn.input("Main class (e.g. com.example.Main): ")
-            end,
-            projectName = "",
-        })
+    local existing = dap.configurations.java or {}
+    local filtered = {}
+    for _, config in ipairs(existing) do
+        if not is_owned_java_launch(config) then
+            table.insert(filtered, config)
+        end
     end
 
-    if not has_config(dap.configurations.java, "Attach to remote JVM (:5005)") then
-        table.insert(dap.configurations.java, {
-            type = "java",
-            request = "attach",
-            name = "Attach to remote JVM (:5005)",
-            hostName = "127.0.0.1",
-            port = function()
-                local port = tonumber(vim.fn.input("JVM debug port: ", "5005"))
-                return port or 5005
-            end,
-        })
+    local configs = build_java_launch_configs(root)
+    for _, config in ipairs(configs) do
+        table.insert(filtered, config)
     end
+
+    dap.configurations.java = filtered
 end
 
 return M
