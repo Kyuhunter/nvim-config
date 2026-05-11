@@ -120,6 +120,8 @@ local function find_preferred_mainclass()
     return nil
 end
 
+local read_stored_mainclasses
+
 local function get_recent_mainclass(root)
     local stored = read_stored_mainclasses(root)
     return stored[1]
@@ -129,7 +131,7 @@ local function get_launch_store_path(root)
     return vim.fs.joinpath(root, ".nvim", "jdtls-main-classes.json")
 end
 
-local function read_stored_mainclasses(root)
+read_stored_mainclasses = function(root)
     local file = io.open(get_launch_store_path(root), "r")
     if not file then
         return {}
