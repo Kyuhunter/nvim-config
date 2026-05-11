@@ -12,9 +12,8 @@ local function has_config(configs, name)
     return false
 end
 
-local function resolve_current_classname()
-    local file = vim.api.nvim_buf_get_name(0)
-    if file == "" then
+local function resolve_classname_from_file(file)
+    if not file or file == "" then
         return nil
     end
 
@@ -23,7 +22,7 @@ local function resolve_current_classname()
         return nil
     end
 
-    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+    local lines = vim.fn.readfile(file, "", 200)
     for _, line in ipairs(lines) do
         local package_name = line:match("^%s*package%s+([%w_.]+)%s*;")
         if package_name and package_name ~= "" then
@@ -32,6 +31,202 @@ local function resolve_current_classname()
     end
 
     return class_name
+end
+
+local function resolve_current_classname()
+    local file = vim.api.nvim_buf_get_name(0)
+    return resolve_classname_from_file(file)
+end
+
+local function trim(value)
+    return vim.trim(value or "")
+end
+
+local root_markers = {
+    { "mvnw", "gradlew" },
+    { "pom.xml", "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts" },
+    { ".git" },
+}
+
+local function find_project_root()
+    local path = vim.api.nvim_buf_get_name(0)
+    if path == "" then
+        path = vim.uv.cwd()
+    end
+
+    -- Prefer the deepest project-like folder to avoid launching from repo root.
+    for dir in vim.fs.parents(path) do
+        for _, sub in ipairs({ "src/main/java", "src/test/java" }) do
+            local stat = vim.uv.fs_stat(dir .. "/" .. sub)
+            if stat and stat.type == "directory" then
+                return dir
+            end
+        end
+    end
+
+    for _, group in ipairs(root_markers) do
+        local root = vim.fs.root(0, group)
+        if root then
+            return root
+        end
+    end
+
+    return vim.uv.cwd()
+end
+
+local function find_preferred_mainclass()
+    local root = find_project_root()
+    if not root or root == "" then
+        return nil
+    end
+
+    local search_paths = {
+        root .. "/src/main/java",
+        root .. "/src",
+        root,
+    }
+
+    for _, filename in ipairs({ "Main.java", "App.java" }) do
+        for _, base in ipairs(search_paths) do
+            local stat = vim.uv.fs_stat(base)
+            if stat and stat.type == "directory" then
+                local matches = vim.fs.find(filename, {
+                    path = base,
+                    upward = false,
+                    type = "file",
+                    limit = 1,
+                })
+
+                local file = matches and matches[1]
+                if file then
+                    local class_name = resolve_classname_from_file(file)
+                    if class_name and class_name ~= "" then
+                        return class_name
+                    end
+                end
+            end
+        end
+    end
+
+    return nil
+end
+
+local function get_launch_store_path(root)
+    return vim.fs.joinpath(root, ".nvim", "jdtls-main-classes.json")
+end
+
+local function read_stored_mainclasses(root)
+    local file = io.open(get_launch_store_path(root), "r")
+    if not file then
+        return {}
+    end
+
+    local content = file:read("*a")
+    file:close()
+
+    if trim(content) == "" then
+        return {}
+    end
+
+    local ok, decoded = pcall(vim.json.decode, content)
+    if not ok or type(decoded) ~= "table" then
+        return {}
+    end
+
+    local classes = decoded.classes
+    if type(classes) ~= "table" then
+        return {}
+    end
+
+    local seen = {}
+    local result = {}
+    for _, class_name in ipairs(classes) do
+        class_name = trim(class_name)
+        if class_name ~= "" and not seen[class_name] then
+            seen[class_name] = true
+            table.insert(result, class_name)
+        end
+    end
+
+    return result
+end
+
+local function save_stored_mainclass(root, class_name)
+    class_name = trim(class_name)
+    if class_name == "" then
+        return
+    end
+
+    local classes = read_stored_mainclasses(root)
+    local result = { class_name }
+    for _, stored in ipairs(classes) do
+        if stored ~= class_name then
+            table.insert(result, stored)
+        end
+    end
+
+    local path = get_launch_store_path(root)
+    vim.fn.mkdir(vim.fs.dirname(path), "p")
+
+    local file = assert(io.open(path, "w"))
+    file:write(vim.json.encode({ classes = result }) .. "\n")
+    file:close()
+end
+
+local function prompt_mainclass_from_menu(root)
+    local stored = read_stored_mainclasses(root)
+
+    if #stored == 0 then
+        local input = trim(vim.fn.input("Main class (e.g. com.example.Main): "))
+        if input ~= "" then
+            save_stored_mainclass(root, input)
+            return input
+        end
+
+        return nil
+    end
+
+    local items = {
+        "Keine Main/App.java gefunden. Wähle eine Klasse:",
+    }
+
+    for index, class_name in ipairs(stored) do
+        table.insert(items, string.format("%d. %s", index, class_name))
+    end
+
+    local custom_index = #stored + 1
+    local cancel_index = #stored + 2
+    table.insert(items, string.format("%d. Eigene Klasse eingeben", custom_index))
+    table.insert(items, string.format("%d. Abbrechen", cancel_index))
+
+    local choice = vim.fn.inputlist(items)
+    if choice >= 1 and choice <= #stored then
+        return stored[choice]
+    end
+
+    if choice == custom_index then
+        local input = trim(vim.fn.input("Main class (e.g. com.example.Main): "))
+        if input ~= "" then
+            save_stored_mainclass(root, input)
+            return input
+        end
+    end
+
+    return nil
+end
+
+local function resolve_launch_mainclass()
+    local preferred_main = find_preferred_mainclass()
+    if preferred_main and preferred_main ~= "" then
+        return preferred_main
+    end
+
+    local root = find_project_root()
+    if not root or root == "" then
+        return nil
+    end
+
+    return prompt_mainclass_from_menu(root)
 end
 
 function M.ensure_adapter()
@@ -66,7 +261,7 @@ function M.ensure_configs()
             cwd = "${workspaceFolder}",
             console = "integratedTerminal",
             mainClass = function()
-                return vim.fn.input("Main class (e.g. com.example.Main): ")
+                return resolve_launch_mainclass()
             end,
             projectName = "",
         })
