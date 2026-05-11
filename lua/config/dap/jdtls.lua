@@ -120,6 +120,11 @@ local function find_preferred_mainclass()
     return nil
 end
 
+local function get_recent_mainclass(root)
+    local stored = read_stored_mainclasses(root)
+    return stored[1]
+end
+
 local function get_launch_store_path(root)
     return vim.fs.joinpath(root, ".nvim", "jdtls-main-classes.json")
 end
@@ -183,18 +188,25 @@ local function save_stored_mainclass(root, class_name)
 end
 
 local function resolve_launch_mainclass()
-    local preferred_main = find_preferred_mainclass()
-    if preferred_main and preferred_main ~= "" then
-        return preferred_main
-    end
-
     local root = find_project_root()
     if not root or root == "" then
         return nil
     end
 
+    local recent_main = get_recent_mainclass(root)
+    if recent_main and recent_main ~= "" then
+        return recent_main
+    end
+
+    local preferred_main = find_preferred_mainclass()
+    if preferred_main and preferred_main ~= "" then
+        save_stored_mainclass(root, preferred_main)
+        return preferred_main
+    end
+
     local input = trim(vim.fn.input("Main class (e.g. com.example.Main): "))
     if input ~= "" then
+        save_stored_mainclass(root, input)
         return input
     end
 
@@ -202,7 +214,7 @@ local function resolve_launch_mainclass()
 end
 
 local function resolve_custom_launch_mainclass(root)
-    local input = trim(vim.fn.input("Custom class name: "))
+    local input = trim(vim.fn.input("Specific class name: "))
     if input ~= "" then
         save_stored_mainclass(root, input)
         return input
@@ -213,19 +225,15 @@ end
 
 local function build_java_launch_configs(root)
     local configs = {}
+    local recent_main = get_recent_mainclass(root)
 
     table.insert(configs, mark_owned_java_launch({
         type = "java",
         request = "launch",
-        name = "Launch Java main class",
+        name = recent_main and recent_main ~= "" and ("Launch Java main class: " .. recent_main) or "Launch Java main class",
         cwd = "${workspaceFolder}",
         console = "integratedTerminal",
         mainClass = function()
-            local preferred_main = find_preferred_mainclass()
-            if preferred_main and preferred_main ~= "" then
-                return preferred_main
-            end
-
             return resolve_launch_mainclass()
         end,
         projectName = "",
@@ -251,7 +259,7 @@ local function build_java_launch_configs(root)
     table.insert(configs, mark_owned_java_launch({
         type = "java",
         request = "launch",
-        name = "Custom",
+        name = "Launch specific class",
         cwd = "${workspaceFolder}",
         console = "integratedTerminal",
         mainClass = function()
@@ -264,7 +272,7 @@ local function build_java_launch_configs(root)
         table.insert(configs, mark_owned_java_launch({
             type = "java",
             request = "launch",
-            name = "Custom: " .. class_name,
+            name = "Launch specific class: " .. class_name,
             cwd = "${workspaceFolder}",
             console = "integratedTerminal",
             mainClass = class_name,
