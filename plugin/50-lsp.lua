@@ -26,6 +26,9 @@ require("mason-tool-installer").setup({
     'emmet_language_server',
     'eslint',
     'clangd',
+    'gopls',
+    'delve',
+    'mmdc',
   }
   -- LuaFormatter on
 })
@@ -37,5 +40,5 @@ vim.lsp.enable({
     "emmet_language_server",
     "eslint",
     "clangd",
+    "gopls",
 })
-

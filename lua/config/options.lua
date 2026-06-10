@@ -85,9 +85,9 @@ opt.splitright = true -- Vertical splits go right
 opt.splitkeep = "screen"
 
 -- Command-line completion
-opt.wildmenu = true
-opt.wildmode = "longest:full,full"
-opt.wildignore:append({ "*.o", "*.obj", "*.pyc", "*.class", "*.jar" })
+-- opt.wildmenu = true
+-- opt.wildmode = "longest:full,full"
+-- opt.wildignore:append({ "*.o", "*.obj", "*.pyc", "*.class", "*.jar" })
 
 -- Better diff options
 opt.diffopt:append("linematch:60")

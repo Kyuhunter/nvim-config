@@ -1,16 +1,13 @@
-local lazy = require("utils.lazy")
+vim.pack.add({ "https://www.github.com/folke/trouble.nvim" })
 
-lazy.on_event("LspAttach", function()
-    vim.pack.add({ "https://www.github.com/folke/trouble.nvim" })
+require("trouble").setup({})
 
-    require("trouble").setup({})
-
-    require("which-key").add({
-        {
-            "<leader>xx",
-            "<cmd>Trouble diagnostics toggle<cr>",
-            desc = "Diagnostics (Trouble)",
-        }, {
+require("which-key").add({
+    {
+        "<leader>xx",
+        "<cmd>Trouble diagnostics toggle<cr>",
+        desc = "Diagnostics (Trouble)",
+    }, {
         "<leader>xX",
         "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
         desc = "Buffer Diagnostics (Trouble)",
@@ -31,5 +28,4 @@ lazy.on_event("LspAttach", function()
         "<cmd>Trouble qflist toggle<cr>",
         desc = "Quickfix List (Trouble)",
     },
-    })
-end)
+})
