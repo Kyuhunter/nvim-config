@@ -28,7 +28,9 @@ lazy.later(function()
             return false
         end
 
-        copilot_chat.setup({})
+        copilot_chat.setup({
+            model = "gpt-4.1",
+        })
         loaded = true
         return true
     end
