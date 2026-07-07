@@ -29,7 +29,7 @@ lazy.later(function()
         end
 
         copilot_chat.setup({
-            model = "gpt-4.1",
+            model = "auto",
         })
         loaded = true
         return true
@@ -41,8 +41,18 @@ lazy.later(function()
         end
     end
 
+    local function select_model()
+        if ensure_loaded() then
+            vim.cmd("CopilotChatModels")
+        end
+    end
+
     vim.keymap.set({ "n", "v" }, "<leader>ac", toggle_chat, {
         desc = "Toggle Copilot Chat",
+    })
+
+    vim.keymap.set("n", "<leader>am", select_model, {
+        desc = "Select Copilot Chat model",
     })
 
     vim.api.nvim_create_user_command("CopilotChatLoad", function()
