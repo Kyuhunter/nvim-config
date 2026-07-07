@@ -15,6 +15,7 @@ lazy.later(function()
     vim.ui.select = require("mini.pick").ui_select
 
     require("CopilotChat").setup({
+        model = "gpt-4o",
         window = {
             layout = "vertical",
             width = 0.4,
