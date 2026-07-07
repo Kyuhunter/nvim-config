@@ -9,7 +9,10 @@ lazy.later(function()
         end
 
         vim.pack.add({
-            "https://github.com/CopilotC-Nvim/CopilotChat.nvim",
+            {
+                src = "https://github.com/CopilotC-Nvim/CopilotChat.nvim",
+                version = "copilot/fix-models-list-error",
+            },
             "https://github.com/zbirenbaum/copilot.lua",
             "https://github.com/nvim-lua/plenary.nvim",
         })
