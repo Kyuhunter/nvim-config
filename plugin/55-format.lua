@@ -7,6 +7,7 @@ lazy.later(function()
         formatters_by_ft = {
             lua = { "luaformat" },
             javascript = { "biome", stop_after_first = true },
+            tex = { "latexindent" },
             xml = { "xmlformatter" },
         },
         formatters = {
@@ -21,7 +22,18 @@ lazy.later(function()
                 },
             },
         },
-        format_on_save = { timeout_ms = 500, lsp_format = "fallback" },
+        format_on_save = function(bufnr)
+            if vim.bo[bufnr].filetype == "tex" then
+                return nil
+            end
+
+            return { timeout_ms = 500, lsp_format = "fallback" }
+        end,
+        format_after_save = function(bufnr)
+            if vim.bo[bufnr].filetype == "tex" then
+                return { timeout_ms = 10000, lsp_format = "fallback" }
+            end
+        end,
     })
 
     vim.api.nvim_create_user_command("Format", function(args)

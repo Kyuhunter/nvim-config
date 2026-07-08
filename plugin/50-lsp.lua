@@ -29,6 +29,7 @@ require("mason-tool-installer").setup({
     'gopls',
     'delve',
     'mmdc',
+    'latexindent',
   }
   -- LuaFormatter on
 })
