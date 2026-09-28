@@ -48,6 +48,10 @@
       "rev": "cc9b2d412d2fbd30b94a70cfc214c2a3be27a0a2",
       "src": "https://www.github.com/Bilal2453/luvit-meta"
     },
+    "marp.nvim": {
+      "rev": "695a1174024dc063523cc4e54dcab65ca3ebce69",
+      "src": "https://github.com/nwiizo/marp.nvim"
+    },
     "mason-lspconfig.nvim": {
       "rev": "63a3c6a80538de1003373a619e29aeda27809ad3",
       "src": "https://www.github.com/mason-org/mason-lspconfig.nvim"
