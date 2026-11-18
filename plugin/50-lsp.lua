@@ -38,6 +38,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
                 'delve',
                 'mmdc',
                 'latexindent',
+                'luaformatter',
+                'xmlformatter',
+                'debugpy',
               }
               -- LuaFormatter on
             })
