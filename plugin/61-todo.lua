@@ -6,4 +6,7 @@ lazy.on_event('LspAttach', function()
         "https://github.com/nvim-lua/plenary.nvim"
     })
     require("todo-comments").setup()
+    require("which-key").add({
+        { "<leader>xt", "<cmd>Trouble todo toggle<cr>", desc = "Todos (Trouble)" },
+    })
 end)

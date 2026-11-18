@@ -6,6 +6,6 @@ wk.add({
     {
         '<leader>u',
         '<cmd>:Undotree<CR>',
-        { desc = "Open Undotree" },
+        desc = "Open Undotree",
     }
 })

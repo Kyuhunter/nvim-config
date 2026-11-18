@@ -142,6 +142,20 @@ local function start_jdtls()
                 end
             end
 
+            require("which-key").add({
+                buffer = bufnr,
+                { "<leader>lo", function() require("jdtls").organize_imports() end, desc = "Organize imports" },
+                { "<leader>lv", function() require("jdtls").extract_variable() end, desc = "Extract variable" },
+                { "<leader>lc", function() require("jdtls").extract_constant() end, desc = "Extract constant" },
+                {
+                    "<leader>lm",
+                    function() require("jdtls").extract_method(true) end,
+                    mode = "x",
+                    desc = "Extract method",
+                },
+                { "<leader>ll", "<cmd>JdtShowLogs<cr>", desc = "Show JDTLS logs" },
+            })
+
             if has_java_test() then
                 vim.keymap.set("n", "<leader>tt", function()
                     require("jdtls.dap").test_class()

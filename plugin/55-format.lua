@@ -11,6 +11,13 @@ lazy.later(function()
             xml = { "xmlformatter" },
         },
         formatters = {
+            latexindent = {
+                -- -m enables line-break changes; "when:after" counts the indentation into the 120 columns
+                prepend_args = {
+                    "-m",
+                    "-y=modifyLineBreaks:textWrapOptions:columns:120,modifyLineBreaks:textWrapOptions:when:after",
+                },
+            },
             luaformat = {
                 command = "lua-format",
                 args = {
@@ -18,6 +25,7 @@ lazy.later(function()
                     '--extra-sep-at-table-end',
                     '--single-quote-to-double-quote',
                     '--spaces-inside-table-braces',
+                    '--column-limit=120',
                     -- LuaFormatter on
                 },
             },
@@ -54,4 +62,5 @@ lazy.later(function()
     end, { range = true })
 
     vim.keymap.set("n", "<leader>F", "<cmd>Format<CR>", { desc = "Format buffer" })
+    vim.keymap.set("x", "<leader>F", ":Format<CR>", { silent = true, desc = "Format selection" })
 end)

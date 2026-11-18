@@ -8,14 +8,16 @@ dap.listeners.after.event_initialized.dapui_config = function()
 	dapui.open()
 end
 
+local function set_dap_hl()
+	vim.api.nvim_set_hl(0, "DapBreakpoint", { ctermbg = 0, fg = "#FF0000" })
+	vim.api.nvim_set_hl(0, "DapLogPoint", { ctermbg = 0, fg = "#61afef" })
+	vim.api.nvim_set_hl(0, "DapStopped", { ctermbg = 0, fg = "#98c379" })
+end
+set_dap_hl() -- loaded lazily, after the colorscheme is already set
 vim.api.nvim_create_autocmd("ColorScheme", {
 	pattern = "*",
 	desc = "prevent colorscheme clears self-defined DAP icon colors.",
-	callback = function()
-		vim.api.nvim_set_hl(0, "DapBreakpoint", { ctermbg = 0, fg = "#FF0000" })
-		vim.api.nvim_set_hl(0, "DapLogPoint", { ctermbg = 0, fg = "#61afef" })
-		vim.api.nvim_set_hl(0, "DapStopped", { ctermbg = 0, fg = "#98c379" })
-	end,
+	callback = set_dap_hl,
 })
 
 vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "DapBreakpoint" })

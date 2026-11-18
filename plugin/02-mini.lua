@@ -53,7 +53,17 @@ wk.add({
         "<leader>pd",
         function() require("mini.extra").pickers.diagnostic() end,
         desc = "Mini list diagnostics",
-    }
+    },
+    { "<leader>pr", "<cmd>Pick resume<cr>", desc = "Resume last picker" },
+    { "<leader>po", "<cmd>Pick oldfiles<cr>", desc = "Recent files" },
+    { "<leader>pw", "<cmd>Pick grep pattern='<cword>'<cr>", desc = "Grep word under cursor" },
+    { "<leader>ph", "<cmd>Pick help<cr>", desc = "Help tags" },
+    { "<leader>pk", "<cmd>Pick keymaps<cr>", desc = "Keymaps" },
+    { "<leader>pc", "<cmd>Pick commands<cr>", desc = "Commands" },
+    { "<leader>pm", "<cmd>Pick marks<cr>", desc = "Marks" },
+    { "<leader>pR", "<cmd>Pick registers<cr>", desc = "Registers" },
+    { "<leader>ps", "<cmd>Pick lsp scope='document_symbol'<cr>", desc = "Document symbols" },
+    { "<leader>pS", "<cmd>Pick lsp scope='workspace_symbol'<cr>", desc = "Workspace symbols" },
 })
 require("mini.move").setup({})
 require("mini.misc").setup({})

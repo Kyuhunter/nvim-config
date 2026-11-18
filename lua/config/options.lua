@@ -7,9 +7,11 @@ vim.g.maplocalleader = " "
 opt.number = true         -- Line numbers
 opt.relativenumber = true -- Relative line numbers
 opt.cursorline = true     -- Highlight current line
-opt.wrap = false          -- Don't wrap lines
-opt.scrolloff = 10        -- Keep 10 lines above/below cursor
-opt.sidescrolloff = 8     -- Keep 8 columns left/right of cursor
+opt.wrap = true
+opt.linebreak = true
+opt.textwidth = 120
+opt.scrolloff = 10    -- Keep 10 lines above/below cursor
+opt.sidescrolloff = 8 -- Keep 8 columns left/right of cursor
 
 -- Indentation
 opt.tabstop = 4        -- Tab width
@@ -64,7 +66,7 @@ opt.hidden = true                                       -- Allow hidden buffers
 opt.errorbells = false                                  -- No error bells
 opt.backspace = "indent,eol,start"                      -- Better backspace behavior
 opt.autochdir = false                                   -- Don't auto change directory
-opt.iskeyword:append("-")                               -- Treat dash as part of word
+--opt.iskeyword:append("-")                               -- Treat dash as part of word
 opt.mouse = "a"                                         -- Enable mouse support
 opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
 opt.modifiable = true                                   -- Allow buffer modifications
@@ -75,7 +77,11 @@ opt.smoothscroll = true
 opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldlevel = 99             -- Start with all folds open
-opt.formatoptions = "jcroqlnt" -- tcqj
+opt.formatoptions = "jcroqln" -- no "t": code is wrapped by formatters, prose via autocmd below
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "markdown", "text", "tex", "gitcommit" },
+    callback = function() vim.opt_local.formatoptions:append("t") end,
+})
 opt.grepformat = "%f:%l:%c:%m"
 opt.grepprg = "rg --vimgrep"
 
@@ -124,6 +130,7 @@ vim.filetype.add({
 })
 vim.g.vimtex_view_method = 'skim'
 vim.g.vimtex_compiler_method = 'latexmk'
+vim.g.vimtex_format_enabled = 1 -- gq respects \item and environments instead of joining them
 
 vim.g.vimtex_compiler_latexmk = {
     continuous = 1,

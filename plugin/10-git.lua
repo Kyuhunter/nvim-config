@@ -6,6 +6,20 @@ lazy.later(function()
         "https://www.github.com/lewis6991/gitsigns.nvim",
     })
 
+    require("which-key").add({
+        { "<leader>gs", "<cmd>Git<cr>", desc = "Status" },
+        { "<leader>gc", "<cmd>Git commit<cr>", desc = "Commit" },
+        { "<leader>gp", "<cmd>Git push<cr>", desc = "Push" },
+        { "<leader>gP", "<cmd>Git pull<cr>", desc = "Pull" },
+        { "<leader>gf", "<cmd>Git fetch<cr>", desc = "Fetch" },
+        { "<leader>gl", "<cmd>Git log --oneline<cr>", desc = "Log" },
+        { "<leader>gb", "<cmd>Git blame<cr>", desc = "Blame file" },
+        { "<leader>gd", "<cmd>Gvdiffsplit<cr>", desc = "Diff split" },
+        { "<leader>gw", "<cmd>Gwrite<cr>", desc = "Stage file" },
+        { "<leader>gB", "<cmd>Pick git_branches<cr>", desc = "Pick branches" },
+        { "<leader>gL", "<cmd>Pick git_commits path='%'<cr>", desc = "Pick file commits" },
+    })
+
     require("gitsigns").setup({
         on_attach = function(bufnr)
             local gitsigns = require("gitsigns")
@@ -40,7 +54,7 @@ lazy.later(function()
                 {
                     "<leader>hs",
                     function() gitsigns.stage_hunk() end,
-                    mode = "v",
+                    mode = { "n", "v" },
                     desc = "Stage Hunk",
                 },
                 {
